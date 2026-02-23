@@ -1,4 +1,4 @@
-# 📱 Smart Attendance System (Absensi App)
+# 📱 Smart Attendance System
 
 Aplikasi Presensi cerdas berbasis Flutter yang menggunakan teknologi Face Detection (Pengenalan Wajah) dan validasi titik lokasi Radius (GPS) untuk mendata kehadiran karyawan secara *real-time* dan mencegah kecurangan.
 
@@ -49,7 +49,7 @@ Jalankan perintah flutter ini di root terminal proyek Anda untuk membuat 1 APK g
 ```bash
 flutter build apk --release
 ```
-🌟 **Hasil Output:** 👉 `build/app/outputs/apk/release/Absensi-v1.0.0.apk`
+🌟 **Hasil Output:** 👉 `build/app/outputs/apk/release/SmartAttendance-v1.0.0.apk`
 
 ### Membangun Berkas APK per Arsitektur (armeabi-v7a / arm64 - Jauh Lebih Ringan)
 Jika Anda ingin ukuran APK *(file size)* yang jauh lebih kecil dan dioptimalkan hanya untuk tipe memori *chipset* HP modern (**arm**), gunakan opsi pemecah (split) ini:
