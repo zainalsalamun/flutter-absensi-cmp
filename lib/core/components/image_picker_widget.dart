@@ -86,7 +86,11 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
                         )
                       : widget.imageUrl != null
                           ? Image.network(
-                              '${Variables.baseUrl}/storage/${widget.imageUrl}',
+                              widget.imageUrl!.startsWith('http')
+                                  ? widget.imageUrl!
+                                  : widget.imageUrl!.startsWith('storage/')
+                                      ? '${Variables.baseUrl}/${widget.imageUrl}'
+                                      : '${Variables.baseUrl}/storage/${widget.imageUrl}',
                               fit: BoxFit.cover,
                             )
                           : Container(
