@@ -20,6 +20,9 @@ import 'package:flutter_absensi_app/presentation/home/bloc/is_checkedin/is_check
 import 'package:flutter_absensi_app/presentation/home/bloc/update_user_register_face/update_user_register_face_bloc.dart';
 import 'package:flutter_absensi_app/presentation/profile/bloc/get_user/get_user_bloc.dart';
 import 'package:flutter_absensi_app/presentation/profile/bloc/update_user/update_user_bloc.dart';
+import 'package:flutter_absensi_app/data/datasources/reimbursement_remote_datasource.dart';
+import 'package:flutter_absensi_app/presentation/home/bloc/add_reimbursement/add_reimbursement_bloc.dart';
+import 'package:flutter_absensi_app/presentation/home/bloc/get_reimbursements/get_reimbursements_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'core/core.dart';
@@ -31,10 +34,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  await FirebaseMessangingRemoteDatasource().initialize();
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } catch (e) {
+    debugPrint('Firebase initialization failed: $e');
+  }
+  FirebaseMessangingRemoteDatasource().initialize().catchError((e) {
+    debugPrint('Firebase messaging initialization failed: $e');
+  });
   runApp(const MyApp());
 }
 
@@ -92,13 +101,22 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create: (context) => UpdateUserBloc(UserRemoteDatasource()),
         ),
+        BlocProvider(
+          create: (context) =>
+              AddReimbursementBloc(ReimbursementRemoteDatasource()),
+        ),
+        BlocProvider(
+          create: (context) =>
+              GetReimbursementsBloc(ReimbursementRemoteDatasource()),
+        ),
       ],
       child: MaterialApp(
-        title: 'Flutter Demo',
+        debugShowCheckedModeBanner: false,
+        title: 'Smart Attendance',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
           dividerTheme:
-              DividerThemeData(color: AppColors.light.withOpacity(0.5)),
+              DividerThemeData(color: AppColors.light.withValues(alpha: 0.5)),
           dialogTheme: const DialogThemeData(elevation: 0),
           textTheme: GoogleFonts.kumbhSansTextTheme(
             Theme.of(context).textTheme,

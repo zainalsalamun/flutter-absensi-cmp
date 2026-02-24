@@ -156,12 +156,13 @@ class $AssetsIconsNavGen {
 class Assets {
   Assets._();
 
+  static const String aEnv = '.env';
   static const $AssetsIconsGen icons = $AssetsIconsGen();
   static const $AssetsImagesGen images = $AssetsImagesGen();
   static const String mobileFaceNet = 'assets/mobile_face_net.tflite';
 
   /// List of all assets
-  static List<String> get values => [mobileFaceNet];
+  static List<String> get values => [aEnv, mobileFaceNet];
 }
 
 class AssetGenImage {
