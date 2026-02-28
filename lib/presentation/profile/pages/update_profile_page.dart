@@ -10,6 +10,7 @@ import '../../../data/datasources/auth_local_datasource.dart';
 import '../../../data/models/request/user_request_model.dart';
 import '../bloc/get_user/get_user_bloc.dart';
 import '../bloc/update_user/update_user_bloc.dart';
+import '../../../data/models/response/user_response_model.dart';
 
 class UpdateProfilePage extends StatefulWidget {
   final User user;
@@ -53,111 +54,158 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text(
-            "Update Profile Page",
-            style: TextStyle(
-                color: AppColors.black,
-                fontSize: 20,
-                fontWeight: FontWeight.w600),
+      backgroundColor: AppColors.white,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: AppColors.white,
+        centerTitle: true,
+        title: const Text(
+          "Update Profile",
+          style: TextStyle(
+            color: AppColors.black,
+            fontSize: 18.0,
+            fontWeight: FontWeight.w700,
           ),
-          actions: const [],
         ),
-        bottomNavigationBar: Padding(
-            padding: EdgeInsets.all(16),
-            child: SizedBox(
-              height: 52,
-              child: BlocConsumer<UpdateUserBloc, UpdateUserState>(
-                listener: (context, state) {
-                  state.maybeMap(
-                    orElse: () {},
-                    success: (user) async {
-                      context
-                          .read<GetUserBloc>()
-                          .add(const GetUserEvent.getUser());
-
-                      const snackBar = SnackBar(
-                        content: Text('Success Update User'),
+        iconTheme: const IconThemeData(color: AppColors.black),
+      ),
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.all(24.0),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.black.withOpacity(0.04),
+              blurRadius: 24.0,
+              offset: const Offset(0, -8),
+            ),
+          ],
+        ),
+        child: SafeArea(
+          child: BlocConsumer<UpdateUserBloc, UpdateUserState>(
+            listener: (context, state) {
+              state.maybeMap(
+                orElse: () {},
+                success: (value) async {
+                  await AuthLocalDatasource()
+                      .updateAuthData(UserResponseModel(user: value.user));
+                  if (context.mounted) {
+                    context
+                        .read<GetUserBloc>()
+                        .add(const GetUserEvent.getUser());
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Profile berhasil diperbarui'),
                         backgroundColor: AppColors.primary,
-                      );
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        snackBar,
-                      );
-                      context.pop(true);
-                    },
-                    error: (e) {
-                      const snackBar = SnackBar(
-                        content: Text('Failed Update User'),
-                        backgroundColor: Colors.red,
-                      );
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        snackBar,
-                      );
-                    },
-                  );
-                },
-                builder: (context, state) {
-                  return state.maybeWhen(
-                    orElse: () {
-                      return Button.filled(
-                        onPressed: () {
-                          final String name = nameController!.text;
-                          final String email = emailController!.text;
-                          final String phone = phoneController!.text;
-                          final UserRequestModel user = UserRequestModel(
-                            id: widget.user.id!,
-                            name: name,
-                            email: email,
-                            phone: phone,
-                            image: imageFile,
-                          );
-                          context.read<UpdateUserBloc>().add(
-                              UpdateUserEvent.updateUser(
-                                  user, widget.user.id!));
-                        },
-                        label: 'Update',
-                      );
-                    },
-                    loading: () {
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    },
-                  );
-                },
-              ),
-            )),
-        body: Padding(
-          padding: const EdgeInsets.all(16),
-          child: ListView(
-            children: [
-              CustomTextField(
-                label: 'Name',
-                controller: nameController!,
-              ),
-              SpaceHeight(16),
-              CustomTextField(
-                label: 'Email',
-                controller: emailController!,
-              ),
-              SpaceHeight(16),
-              CustomTextField(
-                label: 'Phone',
-                controller: phoneController!,
-              ),
-              SpaceHeight(16),
-              ImagePickerWidget(
-                label: 'Image Profile',
-                onChanged: (file) {
-                  if (file == null) {
-                    return;
+                      ),
+                    );
+                    context.pop(true);
                   }
-                  imageFile = file;
                 },
-                imageUrl: widget.user.imageUrl,
-              ),
-            ],
+                error: (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Gagal memperbarui profil'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                },
+              );
+            },
+            builder: (context, state) {
+              return state.maybeWhen(
+                orElse: () {
+                  return Button.filled(
+                    onPressed: () {
+                      final String name = nameController!.text;
+                      final String email = emailController!.text;
+                      final String phone = phoneController!.text;
+                      final UserRequestModel user = UserRequestModel(
+                        id: widget.user.id!,
+                        name: name,
+                        email: email,
+                        phone: phone,
+                        image: imageFile,
+                      );
+                      context.read<UpdateUserBloc>().add(
+                          UpdateUserEvent.updateUser(user, widget.user.id!));
+                    },
+                    label: 'Simpan Perubahan',
+                  );
+                },
+                loading: () {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                },
+              );
+            },
           ),
-        ));
+        ),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(24.0),
+        children: [
+          Center(
+            child: ImagePickerWidget(
+              label: 'Foto Profil',
+              onChanged: (file) {
+                if (file == null) {
+                  return;
+                }
+                imageFile = file;
+              },
+              imageUrl: widget.user.imageUrl,
+            ),
+          ),
+          const SpaceHeight(32.0),
+          const Text(
+            'Informasi Pribadi',
+            style: TextStyle(
+              fontSize: 16.0,
+              fontWeight: FontWeight.w600,
+              color: AppColors.black,
+            ),
+          ),
+          const SpaceHeight(16.0),
+          Container(
+            padding: const EdgeInsets.all(20.0),
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              borderRadius: BorderRadius.circular(20.0),
+              border: Border.all(color: AppColors.grey.withOpacity(0.1)),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.black.withOpacity(0.04),
+                  blurRadius: 15.0,
+                  offset: const Offset(0, 5),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CustomTextField(
+                  label: 'Nama Lengkap',
+                  controller: nameController!,
+                ),
+                const SpaceHeight(20.0),
+                CustomTextField(
+                  label: 'Alamat Email',
+                  controller: emailController!,
+                  keyboardType: TextInputType.emailAddress,
+                ),
+                const SpaceHeight(20.0),
+                CustomTextField(
+                  label: 'Nomor Telepon',
+                  controller: phoneController!,
+                  keyboardType: TextInputType.phone,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
