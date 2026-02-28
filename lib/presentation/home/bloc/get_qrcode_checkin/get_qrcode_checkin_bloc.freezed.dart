@@ -74,9 +74,6 @@ class _$GetQrcodeCheckinEventCopyWithImpl<$Res,
   final $Val _value;
   // ignore: unused_field
   final $Res Function($Val) _then;
-
-  /// Create a copy of GetQrcodeCheckinEvent
-  /// with the given fields replaced by the non-null parameter values.
 }
 
 /// @nodoc
@@ -93,9 +90,6 @@ class __$$StartedImplCopyWithImpl<$Res>
   __$$StartedImplCopyWithImpl(
       _$StartedImpl _value, $Res Function(_$StartedImpl) _then)
       : super(_value, _then);
-
-  /// Create a copy of GetQrcodeCheckinEvent
-  /// with the given fields replaced by the non-null parameter values.
 }
 
 /// @nodoc
@@ -202,8 +196,6 @@ class __$$GetQrcodeCheckinImplCopyWithImpl<$Res>
       $Res Function(_$GetQrcodeCheckinImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of GetQrcodeCheckinEvent
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -251,9 +243,7 @@ class _$GetQrcodeCheckinImpl implements _GetQrcodeCheckin {
   @override
   int get hashCode => Object.hash(runtimeType, barcode, isCheckedIn);
 
-  /// Create a copy of GetQrcodeCheckinEvent
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$GetQrcodeCheckinImplCopyWith<_$GetQrcodeCheckinImpl> get copyWith =>
@@ -330,10 +320,7 @@ abstract class _GetQrcodeCheckin implements GetQrcodeCheckinEvent {
 
   String get barcode;
   bool get isCheckedIn;
-
-  /// Create a copy of GetQrcodeCheckinEvent
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$GetQrcodeCheckinImplCopyWith<_$GetQrcodeCheckinImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -403,9 +390,6 @@ class _$GetQrcodeCheckinStateCopyWithImpl<$Res,
   final $Val _value;
   // ignore: unused_field
   final $Res Function($Val) _then;
-
-  /// Create a copy of GetQrcodeCheckinState
-  /// with the given fields replaced by the non-null parameter values.
 }
 
 /// @nodoc
@@ -422,9 +406,6 @@ class __$$InitialImplCopyWithImpl<$Res>
   __$$InitialImplCopyWithImpl(
       _$InitialImpl _value, $Res Function(_$InitialImpl) _then)
       : super(_value, _then);
-
-  /// Create a copy of GetQrcodeCheckinState
-  /// with the given fields replaced by the non-null parameter values.
 }
 
 /// @nodoc
@@ -533,9 +514,6 @@ class __$$LoadingImplCopyWithImpl<$Res>
   __$$LoadingImplCopyWithImpl(
       _$LoadingImpl _value, $Res Function(_$LoadingImpl) _then)
       : super(_value, _then);
-
-  /// Create a copy of GetQrcodeCheckinState
-  /// with the given fields replaced by the non-null parameter values.
 }
 
 /// @nodoc
@@ -647,8 +625,6 @@ class __$$SuccessImplCopyWithImpl<$Res>
       _$SuccessImpl _value, $Res Function(_$SuccessImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of GetQrcodeCheckinState
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -696,9 +672,7 @@ class _$SuccessImpl implements _Success {
   @override
   int get hashCode => Object.hash(runtimeType, barcode, isCheckedIn);
 
-  /// Create a copy of GetQrcodeCheckinState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
   _$$SuccessImplCopyWith<_$SuccessImpl> get copyWith =>
@@ -779,10 +753,7 @@ abstract class _Success implements GetQrcodeCheckinState {
 
   String get barcode;
   bool get isCheckedIn;
-
-  /// Create a copy of GetQrcodeCheckinState
-  /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
+  @JsonKey(ignore: true)
   _$$SuccessImplCopyWith<_$SuccessImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
