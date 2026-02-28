@@ -3,6 +3,9 @@ import 'package:flutter_absensi_app/presentation/home/pages/history_page.dart';
 import 'package:flutter_absensi_app/presentation/home/pages/home_page.dart';
 import 'package:flutter_absensi_app/presentation/home/pages/setting_page.dart';
 import 'package:flutter_absensi_app/presentation/profile/pages/profile_page.dart';
+import 'package:intl/intl.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../bloc/get_attendance_by_date/get_attendance_by_date_bloc.dart';
 
 import '../../../core/core.dart';
 
@@ -51,7 +54,16 @@ class _MainPageState extends State<MainPage> {
           child: BottomNavigationBar(
             useLegacyColorScheme: false,
             currentIndex: _selectedIndex,
-            onTap: (value) => setState(() => _selectedIndex = value),
+            onTap: (value) {
+              setState(() => _selectedIndex = value);
+              if (value == 1) {
+                final currentDate =
+                    DateFormat('yyyy-MM-dd').format(DateTime.now());
+                context.read<GetAttendanceByDateBloc>().add(
+                      GetAttendanceByDateEvent.getAttendanceByDate(currentDate),
+                    );
+              }
+            },
             type: BottomNavigationBarType.fixed,
             selectedLabelStyle: const TextStyle(color: AppColors.primary),
             selectedIconTheme: const IconThemeData(color: AppColors.primary),
@@ -78,7 +90,7 @@ class _MainPageState extends State<MainPage> {
               BottomNavigationBarItem(
                 icon: Assets.icons.nav.profile.svg(
                   colorFilter: ColorFilter.mode(
-                    _selectedIndex == 3 ? AppColors.primary : AppColors.grey,
+                    _selectedIndex == 2 ? AppColors.primary : AppColors.grey,
                     BlendMode.srcIn,
                   ),
                 ),

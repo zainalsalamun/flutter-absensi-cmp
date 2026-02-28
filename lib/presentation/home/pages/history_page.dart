@@ -21,18 +21,16 @@ class _HistoryPageState extends State<HistoryPage> {
     //current date format yyyy-MM-dd used intl package
     final currentDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
     //get attendance by date
-    context
-        .read<GetAttendanceByDateBloc>()
-        .add(GetAttendanceByDateEvent.getAttendanceByDate(currentDate));
+    context.read<GetAttendanceByDateBloc>().add(
+          GetAttendanceByDateEvent.getAttendanceByDate(currentDate),
+        );
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('History'),
-      ),
+      appBar: AppBar(title: const Text('History')),
       body: ListView(
         padding: const EdgeInsets.all(18.0),
         children: [
@@ -62,29 +60,33 @@ class _HistoryPageState extends State<HistoryPage> {
                   return const SizedBox.shrink();
                 },
                 error: (message) {
-                  return Center(
-                    child: Text(message),
-                  );
+                  return Center(child: Text(message));
                 },
-                loading: () => const Center(
-                  child: CircularProgressIndicator(),
-                ),
+                loading: () => const Center(child: CircularProgressIndicator()),
                 empty: () {
                   return const Center(
-                      child: Text('No attendance data available.'));
+                    child: Text('No attendance data available.'),
+                  );
                 },
                 loaded: (attendance) {
-                  // Ambil data pertama dari list (atau ubah logika sesuai kebutuhan Anda)
-                  // final attendance = attendanceList.first;
-
                   // Pisahkan latlongIn menjadi latitude dan longitude
-                  final latlongInParts = attendance.latlonIn!.split(',');
-                  final latitudeIn = double.parse(latlongInParts.first);
-                  final longitudeIn = double.parse(latlongInParts.last);
+                  double latitudeIn = 0;
+                  double longitudeIn = 0;
+                  if (attendance.latlonIn != null &&
+                      attendance.latlonIn!.contains(',')) {
+                    final latlongInParts = attendance.latlonIn!.split(',');
+                    latitudeIn = double.tryParse(latlongInParts.first) ?? 0;
+                    longitudeIn = double.tryParse(latlongInParts.last) ?? 0;
+                  }
 
-                  final latlongOutParts = attendance.latlonOut!.split(',');
-                  final latitudeOut = double.parse(latlongOutParts.first);
-                  final longitudeOut = double.parse(latlongOutParts.last);
+                  double latitudeOut = 0;
+                  double longitudeOut = 0;
+                  if (attendance.latlonOut != null &&
+                      attendance.latlonOut!.contains(',')) {
+                    final latlongOutParts = attendance.latlonOut!.split(',');
+                    latitudeOut = double.tryParse(latlongOutParts.first) ?? 0;
+                    longitudeOut = double.tryParse(latlongOutParts.last) ?? 0;
+                  }
 
                   return Column(
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -99,19 +101,23 @@ class _HistoryPageState extends State<HistoryPage> {
                         latitude: latitudeIn,
                         longitude: longitudeIn,
                       ),
-                      const SpaceHeight(25),
-                      HistoryAttendance(
-                        statusAbsen: 'Pulang',
-                        isAttendanceIn: false,
-                        time: attendance.timeOut ?? '',
-                        date: attendance.date.toString(),
-                      ),
-                      const SpaceHeight(10.0),
-                      HistoryLocation(
-                        isAttendance: false,
-                        latitude: latitudeOut,
-                        longitude: longitudeOut,
-                      ),
+                      if (attendance.timeOut != null) ...[
+                        const SpaceHeight(25),
+                        HistoryAttendance(
+                          statusAbsen: 'Pulang',
+                          isAttendanceIn: false,
+                          time: attendance.timeOut ?? '',
+                          date: attendance.date.toString(),
+                          overtimeMinutes: attendance.overtimeMinutes,
+                          overtimePay: attendance.overtimePay,
+                        ),
+                        const SpaceHeight(10.0),
+                        HistoryLocation(
+                          isAttendance: false,
+                          latitude: latitudeOut,
+                          longitude: longitudeOut,
+                        ),
+                      ],
                     ],
                   );
                 },

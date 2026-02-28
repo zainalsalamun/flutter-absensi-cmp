@@ -62,10 +62,12 @@ class _FaceDetectorViewState extends State<FaceDetectorCheckinPage> {
   }
 
   void _takePicture(CameraImage cameraImage) async {
-    setState(() {
-      frame = cameraImage;
-      isTakePicture = true;
-    });
+    if (mounted) {
+      setState(() {
+        frame = cameraImage;
+        isTakePicture = true;
+      });
+    }
   }
 
   img.Image? image;
@@ -219,9 +221,11 @@ class _FaceDetectorViewState extends State<FaceDetectorCheckinPage> {
     if (!_canProcess) return;
     if (_isBusy) return;
     _isBusy = true;
-    setState(() {
-      _text = '';
-    });
+    if (mounted) {
+      setState(() {
+        _text = '';
+      });
+    }
     final faces = await _faceDetector.processImage(inputImage);
     if (inputImage.metadata?.size != null &&
         inputImage.metadata?.rotation != null) {

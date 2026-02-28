@@ -70,7 +70,7 @@ class _FaceDetectorViewState extends State<FaceDetectorView> {
   performFaceRecognition(List<Face> faces) async {
     recognitions.clear();
 
-    image = convertNV21ToImage(frame!);
+    image = convertToImage(frame!);
     image = img.copyRotate(image!,
         angle: _cameraLensDirection == CameraLensDirection.front ? 270 : 90);
 
@@ -89,10 +89,23 @@ class _FaceDetectorViewState extends State<FaceDetectorView> {
       recognitions.add(recognition);
 
       if (register) {
-        showFaceRegistrationDialogue(
-          croppedFace,
-          recognition,
-        );
+        final bool isValid =
+            await recognizer.isValidFace(recognition.embedding);
+        if (isValid) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Wajah sudah terdaftar!'),
+                backgroundColor: AppColors.red,
+              ),
+            );
+          }
+        } else {
+          showFaceRegistrationDialogue(
+            croppedFace,
+            recognition,
+          );
+        }
         register = false;
       }
     }
@@ -170,25 +183,85 @@ class _FaceDetectorViewState extends State<FaceDetectorView> {
     );
   }
 
-  img.Image convertNV21ToImage(CameraImage cameraImage) {
+  img.Image convertToImage(CameraImage cameraImage) {
+    if (cameraImage.format.group == ImageFormatGroup.bgra8888) {
+      return _convertBGRA8888ToImage(cameraImage);
+    } else if (cameraImage.format.group == ImageFormatGroup.yuv420 ||
+        cameraImage.format.group == ImageFormatGroup.nv21) {
+      return _convertYUVToImage(cameraImage);
+    }
+    return img.Image(width: cameraImage.width, height: cameraImage.height);
+  }
+
+  img.Image _convertBGRA8888ToImage(CameraImage cameraImage) {
+    final plane = cameraImage.planes[0];
+    return img.Image.fromBytes(
+      width: cameraImage.width,
+      height: cameraImage.height,
+      bytes: plane.bytes.buffer,
+      order: img.ChannelOrder.bgra,
+    );
+  }
+
+  img.Image _convertYUVToImage(CameraImage cameraImage) {
     final width = cameraImage.width;
     final height = cameraImage.height;
+    final img.Image image = img.Image(width: width, height: height);
 
-    Uint8List nv21Bytes = cameraImage.planes[0].bytes;
-    final image = img.Image(width: width, height: height);
+    if (cameraImage.format.group == ImageFormatGroup.nv21 ||
+        cameraImage.planes.length == 1) {
+      // NV21 (Android)
+      final bytes = cameraImage.planes[0].bytes;
+      for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+          final int yIndex = y * width + x;
+          final int uvIndex = width * height + (y >> 1) * width + (x & ~1);
 
-    // Convert NV21 format to RGB
-    for (int y = 0; y < height; y++) {
-      for (int x = 0; x < width; x++) {
-        // Dapatkan nilai Y (kecerahan) dari NV21
-        int yValue = nv21Bytes[y * width + x];
+          final int yValue = bytes[yIndex];
+          final int vValue = bytes[uvIndex];
+          final int uValue = bytes[uvIndex + 1];
 
-        // Karena format NV21 tidak menyertakan U/V (krominans) di sini, kita asumsikan grayscale
-        var color = image.getColor(yValue, yValue, yValue); // Buat grayscale
-        image.setPixel(x, y, color); // Tetapkan pixel di posisi (x, y)
+          image.setPixelR(x, y, yuv2rgb(yValue, uValue, vValue));
+        }
+      }
+    } else {
+      // YUV420 (standard)
+      final yRowStride = cameraImage.planes[0].bytesPerRow;
+      final uvRowStride = cameraImage.planes[1].bytesPerRow;
+      final uvPixelStride = cameraImage.planes[1].bytesPerPixel!;
+
+      for (var w = 0; w < width; w++) {
+        for (var h = 0; h < height; h++) {
+          final uvIndex =
+              uvPixelStride * (w / 2).floor() + uvRowStride * (h / 2).floor();
+          final yIndex = h * yRowStride + w;
+
+          final y = cameraImage.planes[0].bytes[yIndex];
+          final u = cameraImage.planes[1].bytes[uvIndex];
+          final v = cameraImage.planes[2].bytes[uvIndex];
+
+          image.setPixelR(w, h, yuv2rgb(y, u, v));
+        }
       }
     }
     return image;
+  }
+
+  int yuv2rgb(int y, int u, int v) {
+    // Convert yuv pixel to rgb
+    var r = (y + v * 1436 / 1024 - 179).round();
+    var g = (y - u * 46549 / 131072 + 44 - v * 93604 / 131072 + 91).round();
+    var b = (y + u * 1814 / 1024 - 227).round();
+
+    // Clipping RGB values to be inside boundaries [ 0 , 255 ]
+    r = r.clamp(0, 255);
+    g = g.clamp(0, 255);
+    b = b.clamp(0, 255);
+
+    return 0xff000000 |
+        ((b << 16) & 0xff0000) |
+        ((g << 8) & 0xff00) |
+        (r & 0xff);
   }
 
   @override

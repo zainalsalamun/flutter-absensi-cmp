@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 
 import '../../../core/core.dart';
 
@@ -17,19 +18,10 @@ class LocationPage extends StatefulWidget {
 }
 
 class _LocationPageState extends State<LocationPage> {
-  void _onMapCreated(GoogleMapController controller) {
-    mapController = controller;
-  }
-
-  late GoogleMapController mapController;
-
   @override
   Widget build(BuildContext context) {
     LatLng center = LatLng(widget.latitude ?? 0, widget.longitude ?? 0);
-    Marker marker = Marker(
-      markerId: const MarkerId("marker_1"),
-      position: LatLng(widget.latitude ?? 0, widget.longitude ?? 0),
-    );
+
     return Scaffold(
       body: Stack(
         children: [
@@ -40,13 +32,32 @@ class _LocationPageState extends State<LocationPage> {
                       color: AppColors.primary,
                     ),
                   )
-                : GoogleMap(
-                    onMapCreated: _onMapCreated,
-                    initialCameraPosition: CameraPosition(
-                      target: center,
-                      zoom: 18.0,
+                : FlutterMap(
+                    options: MapOptions(
+                      initialCenter: center,
+                      initialZoom: 18.0,
                     ),
-                    markers: {marker},
+                    children: [
+                      TileLayer(
+                        urlTemplate:
+                            'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                        userAgentPackageName: 'com.naltech.attendance',
+                      ),
+                      MarkerLayer(
+                        markers: [
+                          Marker(
+                            point: center,
+                            width: 80,
+                            height: 80,
+                            child: const Icon(
+                              Icons.location_on,
+                              color: Colors.red,
+                              size: 40,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
           ),
           Padding(
@@ -56,7 +67,20 @@ class _LocationPageState extends State<LocationPage> {
             ),
             child: GestureDetector(
               onTap: () => context.pop(),
-              child: Assets.icons.back.svg(),
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 10,
+                    )
+                  ],
+                ),
+                child: const Icon(Icons.arrow_back, color: AppColors.black),
+              ),
             ),
           ),
         ],

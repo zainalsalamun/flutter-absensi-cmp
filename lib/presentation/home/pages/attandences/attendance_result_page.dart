@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_absensi_app/presentation/home/bloc/checkout_attendance/checkout_attendance_bloc.dart';
 import 'package:flutter_absensi_app/presentation/home/pages/attandences/scanner_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:location/location.dart';
+import 'package:geolocator/geolocator.dart';
 
 import 'package:flutter_absensi_app/core/core.dart';
 import 'package:flutter_absensi_app/presentation/home/bloc/checkin_attendance/checkin_attendance_bloc.dart';
@@ -39,42 +39,28 @@ class _RecognitionResultPageState extends State<AttendanceResultPage> {
 
   Future<void> getCurrentPosition() async {
     try {
-      Location location = Location();
-
-      bool serviceEnabled;
-      PermissionStatus permissionGranted;
-      LocationData locationData;
-
-      serviceEnabled = await location.serviceEnabled();
-      if (!serviceEnabled) {
-        serviceEnabled = await location.requestService();
-        if (!serviceEnabled) {
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
           return;
         }
       }
 
-      permissionGranted = await location.hasPermission();
-      if (permissionGranted == PermissionStatus.denied) {
-        permissionGranted = await location.requestPermission();
-        if (permissionGranted != PermissionStatus.granted) {
-          return;
-        }
+      if (permission == LocationPermission.deniedForever) {
+        return;
       }
 
-      locationData = await location.getLocation();
-      latitude = locationData.latitude;
-      longitude = locationData.longitude;
-
-      setState(() {});
-    } on PlatformException catch (e) {
-      if (e.code == 'IO_ERROR') {
-        debugPrint(
-            'A network error occurred trying to lookup the supplied coordinates: ${e.message}');
-      } else {
-        debugPrint('Failed to lookup coordinates: ${e.message}');
+      final position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.best);
+      if (mounted) {
+        setState(() {
+          latitude = position.latitude;
+          longitude = position.longitude;
+        });
       }
     } catch (e) {
-      debugPrint('An unknown error occurred: $e');
+      debugPrint('Error getting location: $e');
     }
   }
 
@@ -148,7 +134,30 @@ class _RecognitionResultPageState extends State<AttendanceResultPage> {
                           return Padding(
                             padding: const EdgeInsets.all(16),
                             child: Button.filled(
-                              onPressed: () {
+                              onPressed: () async {
+                                if (latitude == null || longitude == null) {
+                                  try {
+                                    final position =
+                                        await Geolocator.getCurrentPosition(
+                                            desiredAccuracy:
+                                                LocationAccuracy.best);
+                                    latitude = position.latitude;
+                                    longitude = position.longitude;
+                                  } catch (e) {
+                                    // ignore
+                                  }
+                                }
+
+                                if (latitude == null || longitude == null) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                          'Lokasi belum ditemukan, pastikan GPS aktif.'),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                  return;
+                                }
                                 context.read<CheckinAttendanceBloc>().add(
                                       CheckinAttendanceEvent.checkin(
                                           latitude.toString(),
@@ -192,7 +201,31 @@ class _RecognitionResultPageState extends State<AttendanceResultPage> {
                               return Padding(
                                 padding: const EdgeInsets.all(16),
                                 child: Button.filled(
-                                  onPressed: () {
+                                  onPressed: () async {
+                                    if (latitude == null || longitude == null) {
+                                      try {
+                                        final position =
+                                            await Geolocator.getCurrentPosition(
+                                                desiredAccuracy:
+                                                    LocationAccuracy.best);
+                                        latitude = position.latitude;
+                                        longitude = position.longitude;
+                                      } catch (e) {
+                                        // ignore
+                                      }
+                                    }
+
+                                    if (latitude == null || longitude == null) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                              'Lokasi belum ditemukan, pastikan GPS aktif.'),
+                                          backgroundColor: Colors.red,
+                                        ),
+                                      );
+                                      return;
+                                    }
                                     context.read<CheckoutAttendanceBloc>().add(
                                           CheckoutAttendanceEvent.checkout(
                                               latitude.toString(),
