@@ -22,7 +22,26 @@ class UserRemoteDatasource {
       },
     );
     if (response.statusCode == 200) {
-      return right(User.fromMap(jsonDecode(response.body)['data']));
+      try {
+        final decoded = jsonDecode(response.body);
+        Map<String, dynamic>? userMap;
+        if (decoded is Map<String, dynamic>) {
+          if (decoded.containsKey('data')) {
+            userMap = decoded['data'];
+          } else if (decoded.containsKey('user')) {
+            userMap = decoded['user'];
+          } else {
+            userMap = decoded;
+          }
+        }
+        if (userMap != null) {
+          return right(User.fromMap(userMap));
+        } else {
+          return left('Format API tidak sesuai');
+        }
+      } catch (e) {
+        return left('Gagal memparsing respons');
+      }
     } else {
       return left(response.body);
     }
@@ -50,7 +69,26 @@ class UserRemoteDatasource {
     final String body = await response.stream.bytesToString();
 
     if (response.statusCode == 200) {
-      return right(User.fromMap(jsonDecode(body)['data']));
+      try {
+        final decoded = jsonDecode(body);
+        Map<String, dynamic>? userMap;
+        if (decoded is Map<String, dynamic>) {
+          if (decoded.containsKey('data')) {
+            userMap = decoded['data'];
+          } else if (decoded.containsKey('user')) {
+            userMap = decoded['user'];
+          } else {
+            userMap = decoded;
+          }
+        }
+        if (userMap != null) {
+          return right(User.fromMap(userMap));
+        } else {
+          return left('Format API tidak sesuai: $body');
+        }
+      } catch (e) {
+        return left('Gagal memparsing respons: $body');
+      }
     } else {
       return left(body);
     }

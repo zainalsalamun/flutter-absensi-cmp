@@ -38,6 +38,8 @@ class Attendance {
   final String? timeOut;
   final String? latlonIn;
   final String? latlonOut;
+  final int? overtimeMinutes;
+  final dynamic overtimePay;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -49,6 +51,8 @@ class Attendance {
     this.timeOut,
     this.latlonIn,
     this.latlonOut,
+    this.overtimeMinutes,
+    this.overtimePay,
     this.createdAt,
     this.updatedAt,
   });
@@ -66,6 +70,8 @@ class Attendance {
         timeOut: json["time_out"],
         latlonIn: json["latlon_in"],
         latlonOut: json["latlon_out"],
+        overtimeMinutes: json["overtime_minutes"],
+        overtimePay: json["overtime_pay"],
         createdAt: json["created_at"] == null
             ? null
             : DateTime.parse(json["created_at"]),
@@ -83,6 +89,8 @@ class Attendance {
         "time_out": timeOut,
         "latlon_in": latlonIn,
         "latlon_out": latlonOut,
+        "overtime_minutes": overtimeMinutes,
+        "overtime_pay": overtimePay,
         "created_at": createdAt?.toIso8601String(),
         "updated_at": updatedAt?.toIso8601String(),
       };
