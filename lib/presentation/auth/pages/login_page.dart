@@ -43,10 +43,40 @@ class _LoginPageState extends State<LoginPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const SpaceHeight(50),
-              Image.asset(
-                Assets.images.logo.path,
-                width: MediaQuery.of(context).size.width,
-                height: 100,
+              Column(
+                children: [
+                  Container(
+                    width: 120,
+                    height: 120,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(28),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primary.withValues(alpha: 0.2),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(28),
+                      child: Image.asset(
+                        'assets/images/smart_attendance_app_icon.png',
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                  const SpaceHeight(16),
+                  Text(
+                    'Smart Attendance',
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primary,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ],
               ),
               const SpaceHeight(107),
               CustomTextField(
