@@ -2,14 +2,12 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:image/image.dart' as img;
 
 import 'package:flutter_absensi_app/core/core.dart';
 
 import 'package:flutter_absensi_app/presentation/home/pages/face_detector_painter.dart';
-import 'package:flutter_absensi_app/presentation/home/pages/main_page.dart';
 
 import '../../../../core/ml/recognition_embedding.dart';
 import '../../../../core/ml/recognizer.dart';

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_absensi_app/presentation/home/pages/history_page.dart';
 import 'package:flutter_absensi_app/presentation/home/pages/home_page.dart';
-import 'package:flutter_absensi_app/presentation/home/pages/setting_page.dart';
 import 'package:flutter_absensi_app/presentation/profile/pages/profile_page.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
