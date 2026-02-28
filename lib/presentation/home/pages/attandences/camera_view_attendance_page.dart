@@ -441,9 +441,11 @@ class _CameraViewState extends State<CameraViewAttendancePage> {
         if ((faces.first.leftEyeOpenProbability ?? 1.0) < 0.75 &&
             (faces.first.rightEyeOpenProbability ?? 1.0) < 0.75) {
           widget.onTakePicture(frame!);
-          setState(() {
-            _didCloseEyes = false;
-          });
+          if (mounted) {
+            setState(() {
+              _didCloseEyes = false;
+            });
+          }
         }
       }
 

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:camera/camera.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +13,7 @@ import 'package:flutter_absensi_app/presentation/home/widgets/face_detector_pain
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:image/image.dart' as img;
-import 'package:location/location.dart';
+import 'package:geolocator/geolocator.dart';
 
 import '../../../core/core.dart';
 
@@ -57,7 +59,14 @@ class _AttendanceCheckinPageState extends State<AttendanceCheckinPage> {
 
   _initializeCamera() async {
     _availableCameras = await availableCameras();
-    _controller = CameraController(description, ResolutionPreset.high);
+    _controller = CameraController(
+      description,
+      ResolutionPreset.high,
+      enableAudio: false,
+      imageFormatGroup: Platform.isAndroid
+          ? ImageFormatGroup.nv21
+          : ImageFormatGroup.bgra8888,
+    );
     await _controller!.initialize().then((_) {
       if (!mounted) {
         return;
@@ -78,8 +87,8 @@ class _AttendanceCheckinPageState extends State<AttendanceCheckinPage> {
   dynamic _scanResults;
   CameraImage? frame;
   doFaceDetectionOnFrame() async {
-    //TODO convert frame into InputImage format
-    InputImage inputImage = getInputImage();
+    InputImage? inputImage = getInputImage();
+    if (inputImage == null) return;
 
     //TODO pass InputImage to face detection model and detect faces
     List<Face> faces = await detector.processImage(inputImage);
@@ -99,7 +108,7 @@ class _AttendanceCheckinPageState extends State<AttendanceCheckinPage> {
     recognitions.clear();
 
     //TODO convert CameraImage to Image and rotate it so that our frame will be in a portrait
-    image = convertYUV420ToImage(frame!);
+    image = convertToImage(frame!);
     image = img.copyRotate(image!,
         angle: camDirec == CameraLensDirection.front ? 270 : 90);
 
@@ -144,27 +153,65 @@ class _AttendanceCheckinPageState extends State<AttendanceCheckinPage> {
   //ketika absen authdata->face_embedding compare dengan yang dari tflite.
 
   // TODO method to convert CameraImage to Image
-  img.Image convertYUV420ToImage(CameraImage cameraImage) {
+  img.Image convertToImage(CameraImage cameraImage) {
+    if (cameraImage.format.group == ImageFormatGroup.bgra8888) {
+      return _convertBGRA8888ToImage(cameraImage);
+    } else if (cameraImage.format.group == ImageFormatGroup.yuv420 ||
+        cameraImage.format.group == ImageFormatGroup.nv21) {
+      return _convertYUVToImage(cameraImage);
+    }
+    return img.Image(width: cameraImage.width, height: cameraImage.height);
+  }
+
+  img.Image _convertBGRA8888ToImage(CameraImage cameraImage) {
+    final plane = cameraImage.planes[0];
+    return img.Image.fromBytes(
+      width: cameraImage.width,
+      height: cameraImage.height,
+      bytes: plane.bytes.buffer,
+      order: img.ChannelOrder.bgra,
+    );
+  }
+
+  img.Image _convertYUVToImage(CameraImage cameraImage) {
     final width = cameraImage.width;
     final height = cameraImage.height;
+    final img.Image image = img.Image(width: width, height: height);
 
-    final yRowStride = cameraImage.planes[0].bytesPerRow;
-    final uvRowStride = cameraImage.planes[1].bytesPerRow;
-    final uvPixelStride = cameraImage.planes[1].bytesPerPixel!;
+    if (cameraImage.format.group == ImageFormatGroup.nv21 ||
+        cameraImage.planes.length == 1) {
+      // NV21 (Android)
+      final bytes = cameraImage.planes[0].bytes;
+      for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+          final int yIndex = y * width + x;
+          final int uvIndex = width * height + (y >> 1) * width + (x & ~1);
 
-    final image = img.Image(width: width, height: height);
+          final int yValue = bytes[yIndex];
+          final int vValue = bytes[uvIndex];
+          final int uValue = bytes[uvIndex + 1];
 
-    for (var w = 0; w < width; w++) {
-      for (var h = 0; h < height; h++) {
-        final uvIndex =
-            uvPixelStride * (w / 2).floor() + uvRowStride * (h / 2).floor();
-        final yIndex = h * yRowStride + w;
+          image.setPixelR(x, y, yuv2rgb(yValue, uValue, vValue));
+        }
+      }
+    } else {
+      // YUV420 (standard)
+      final yRowStride = cameraImage.planes[0].bytesPerRow;
+      final uvRowStride = cameraImage.planes[1].bytesPerRow;
+      final uvPixelStride = cameraImage.planes[1].bytesPerPixel!;
 
-        final y = cameraImage.planes[0].bytes[yIndex];
-        final u = cameraImage.planes[1].bytes[uvIndex];
-        final v = cameraImage.planes[2].bytes[uvIndex];
+      for (var w = 0; w < width; w++) {
+        for (var h = 0; h < height; h++) {
+          final uvIndex =
+              uvPixelStride * (w / 2).floor() + uvRowStride * (h / 2).floor();
+          final yIndex = h * yRowStride + w;
 
-        image.data!.setPixelR(w, h, yuv2rgb(y, u, v)); //= yuv2rgb(y, u, v);
+          final y = cameraImage.planes[0].bytes[yIndex];
+          final u = cameraImage.planes[1].bytes[uvIndex];
+          final v = cameraImage.planes[2].bytes[uvIndex];
+
+          image.setPixelR(w, h, yuv2rgb(y, u, v));
+        }
       }
     }
     return image;
@@ -187,39 +234,92 @@ class _AttendanceCheckinPageState extends State<AttendanceCheckinPage> {
         (r & 0xff);
   }
 
+  final _orientations = {
+    DeviceOrientation.portraitUp: 0,
+    DeviceOrientation.landscapeLeft: 90,
+    DeviceOrientation.portraitDown: 180,
+    DeviceOrientation.landscapeRight: 270,
+  };
+
   //TODO convert CameraImage to InputImage
-  InputImage getInputImage() {
-    final WriteBuffer allBytes = WriteBuffer();
-    for (final Plane plane in frame!.planes) {
-      allBytes.putUint8List(plane.bytes);
-    }
-    final bytes = allBytes.done().buffer.asUint8List();
-    final Size imageSize =
-        Size(frame!.width.toDouble(), frame!.height.toDouble());
+  InputImage? getInputImage() {
     final camera = description;
-    final imageRotation =
-        InputImageRotationValue.fromRawValue(camera.sensorOrientation);
+    final sensorOrientation = camera.sensorOrientation;
+    InputImageRotation? rotation;
+    if (Platform.isIOS) {
+      rotation = InputImageRotationValue.fromRawValue(sensorOrientation);
+    } else if (Platform.isAndroid) {
+      var rotationCompensation =
+          _orientations[_controller!.value.deviceOrientation];
+      if (rotationCompensation != null) {
+        if (camera.lensDirection == CameraLensDirection.front) {
+          // front-facing
+          rotationCompensation =
+              (sensorOrientation + rotationCompensation) % 360;
+        } else {
+          // back-facing
+          rotationCompensation =
+              (sensorOrientation - rotationCompensation + 360) % 360;
+        }
+        rotation = InputImageRotationValue.fromRawValue(rotationCompensation);
+      }
+    }
+    rotation ??= InputImageRotation.rotation0deg;
 
-    final inputImageFormat =
-        InputImageFormatValue.fromRawValue(frame!.format.raw);
+    final format = InputImageFormatValue.fromRawValue(frame!.format.raw);
+    if (format == null) return null;
 
-    final int bytesPerRow =
-        frame?.planes.isNotEmpty == true ? frame!.planes.first.bytesPerRow : 0;
+    if (format == InputImageFormat.nv21 && frame!.planes.length == 1) {
+      final plane = frame!.planes.first;
+      return InputImage.fromBytes(
+        bytes: plane.bytes,
+        metadata: InputImageMetadata(
+          size: Size(frame!.width.toDouble(), frame!.height.toDouble()),
+          rotation: rotation, // used only in Android
+          format: format, // used only in iOS
+          bytesPerRow: plane.bytesPerRow, // used only in iOS
+        ),
+      );
+    } else {
+      final WriteBuffer allBytes = WriteBuffer();
+      for (final Plane plane in frame!.planes) {
+        allBytes.putUint8List(plane.bytes);
+      }
+      final bytes = allBytes.done().buffer.asUint8List();
 
-    final inputImageMetaData = InputImageMetadata(
-      size: imageSize,
-      rotation: imageRotation!,
-      format: inputImageFormat!,
-      bytesPerRow: bytesPerRow,
-    );
-
-    final inputImage =
-        InputImage.fromBytes(bytes: bytes, metadata: inputImageMetaData);
-
-    return inputImage;
+      return InputImage.fromBytes(
+        bytes: bytes,
+        metadata: InputImageMetadata(
+          size: Size(frame!.width.toDouble(), frame!.height.toDouble()),
+          rotation: rotation,
+          format: format,
+          bytesPerRow: frame!.planes.first.bytesPerRow,
+        ),
+      );
+    }
   }
 
   void _takeAbsen() async {
+    if (latitude == null || longitude == null) {
+      try {
+        final position = await Geolocator.getCurrentPosition(
+            desiredAccuracy: LocationAccuracy.best);
+        latitude = position.latitude;
+        longitude = position.longitude;
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    if (latitude == null || longitude == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Lokasi belum ditemukan, pastikan GPS aktif.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
     if (mounted) {
       context.read<CheckinAttendanceBloc>().add(
             CheckinAttendanceEvent.checkin(
@@ -265,49 +365,35 @@ class _AttendanceCheckinPageState extends State<AttendanceCheckinPage> {
 
   Future<void> getCurrentPosition() async {
     try {
-      Location location = Location();
-
-      bool serviceEnabled;
-      PermissionStatus permissionGranted;
-      LocationData locationData;
-
-      serviceEnabled = await location.serviceEnabled();
-      if (!serviceEnabled) {
-        serviceEnabled = await location.requestService();
-        if (!serviceEnabled) {
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
           return;
         }
       }
 
-      permissionGranted = await location.hasPermission();
-      if (permissionGranted == PermissionStatus.denied) {
-        permissionGranted = await location.requestPermission();
-        if (permissionGranted != PermissionStatus.granted) {
-          return;
-        }
+      if (permission == LocationPermission.deniedForever) {
+        return;
       }
 
-      locationData = await location.getLocation();
-      latitude = locationData.latitude;
-      longitude = locationData.longitude;
-
-      setState(() {});
-    } on PlatformException catch (e) {
-      if (e.code == 'IO_ERROR') {
-        debugPrint(
-            'A network error occurred trying to lookup the supplied coordinates: ${e.message}');
-      } else {
-        debugPrint('Failed to lookup coordinates: ${e.message}');
+      final position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.best);
+      if (mounted) {
+        setState(() {
+          latitude = position.latitude;
+          longitude = position.longitude;
+        });
       }
     } catch (e) {
-      debugPrint('An unknown error occurred: $e');
+      debugPrint('Error getting location: $e');
     }
   }
 
   @override
   Widget build(BuildContext context) {
     size = MediaQuery.of(context).size;
-    if (_controller == null) {
+    if (_controller == null || !_controller!.value.isInitialized) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
       );

@@ -10,12 +10,17 @@ class HistoryAttendance extends StatelessWidget {
   final String date;
   final String statusAbsen;
   final bool isAttendanceIn;
+  final int? overtimeMinutes;
+  final dynamic overtimePay;
+
   const HistoryAttendance({
     super.key,
     required this.time,
     required this.date,
     required this.statusAbsen,
     this.isAttendanceIn = true,
+    this.overtimeMinutes,
+    this.overtimePay,
   });
 
   @override
@@ -39,12 +44,7 @@ class HistoryAttendance extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              Text(
-                time,
-                style: const TextStyle(
-                  color: AppColors.white,
-                ),
-              ),
+              Text(time, style: const TextStyle(color: AppColors.white)),
             ],
           ),
           const SpaceHeight(4.0),
@@ -52,21 +52,30 @@ class HistoryAttendance extends StatelessWidget {
             children: [
               Assets.icons.location.svg(),
               const SpaceWidth(8.0),
-              const Text(
-                'Kantor',
-                style: TextStyle(
-                  color: AppColors.white,
-                ),
-              ),
+              const Text('Kantor', style: TextStyle(color: AppColors.white)),
               const Spacer(),
               Text(
                 date.substring(0, 10),
-                style: const TextStyle(
-                  color: AppColors.white,
-                ),
+                style: const TextStyle(color: AppColors.white),
               ),
             ],
           ),
+          if (overtimeMinutes != null && overtimeMinutes! > 0) ...[
+            const SpaceHeight(8.0),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Lembur', style: TextStyle(color: AppColors.white)),
+                Text(
+                  '$overtimeMinutes Menit (Rp ${overtimePay ?? 0})',
+                  style: const TextStyle(
+                    color: AppColors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );
