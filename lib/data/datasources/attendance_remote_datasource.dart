@@ -69,7 +69,12 @@ class AttendanceRemoteDatasource {
     if (response.statusCode == 200) {
       return Right(CheckInOutResponseModel.fromJson(response.body));
     } else {
-      return const Left('Failed to checkin');
+      try {
+        final error = jsonDecode(response.body);
+        return Left(error['message'] ?? 'Failed to checkin');
+      } catch (e) {
+        return Left('Failed to checkin: ${response.statusCode}');
+      }
     }
   }
 
@@ -90,7 +95,12 @@ class AttendanceRemoteDatasource {
     if (response.statusCode == 200) {
       return Right(CheckInOutResponseModel.fromJson(response.body));
     } else {
-      return const Left('Failed to checkin');
+      try {
+        final error = jsonDecode(response.body);
+        return Left(error['message'] ?? 'Failed to checkout');
+      } catch (e) {
+        return Left('Failed to checkout: ${response.statusCode}');
+      }
     }
   }
 

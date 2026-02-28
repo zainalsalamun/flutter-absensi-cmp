@@ -35,19 +35,26 @@ class AuthRemoteDatasource {
   Future<Either<String, String>> logout() async {
     final authData = await AuthLocalDatasource().getAuthData();
     final url = Uri.parse('${Variables.baseUrl}/api/logout');
-    final response = await http.post(
-      url,
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ${authData?.token}',
-      },
-    );
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${authData?.token}',
+        },
+      );
+      await AuthLocalDatasource().removeAuthData();
 
-    if (response.statusCode == 200) {
+      if (response.statusCode == 200) {
+        return const Right('Logout success');
+      } else {
+        return const Right(
+            'Logout success'); // Force success so they can leave the page
+      }
+    } catch (e) {
+      await AuthLocalDatasource().removeAuthData();
       return const Right('Logout success');
-    } else {
-      return const Left('Failed to logout');
     }
   }
 

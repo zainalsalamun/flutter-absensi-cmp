@@ -36,8 +36,8 @@ class FirebaseMessangingRemoteDatasource {
 
     print('FCM Token: $fcmToken');
 
-    if (await AuthLocalDatasource().getAuthData() != null) {
-      AuthRemoteDatasource().updateFcmToken(fcmToken!);
+    if (fcmToken != null && await AuthLocalDatasource().getAuthData() != null) {
+      AuthRemoteDatasource().updateFcmToken(fcmToken);
     }
 
     FirebaseMessaging.instance.getInitialMessage();
@@ -58,20 +58,11 @@ class FirebaseMessangingRemoteDatasource {
       title,
       body,
       const NotificationDetails(
-        android: AndroidNotificationDetails(
-            'com.example.flutter_absensi_app', 'app',
+        android: AndroidNotificationDetails('com.naltech.attendance', 'app',
             importance: Importance.max),
         iOS: DarwinNotificationDetails(),
       ),
     );
-  }
-
-  @pragma('vm:entry-point')
-  Future<void> _firebaseMessagingBackgroundHandler(
-      RemoteMessage message) async {
-    await Firebase.initializeApp();
-
-    FirebaseMessangingRemoteDatasource().firebaseBackgroundHandler(message);
   }
 
   Future<void> firebaseBackgroundHandler(RemoteMessage message) async {
@@ -80,4 +71,11 @@ class FirebaseMessangingRemoteDatasource {
       body: message.notification!.body,
     );
   }
+}
+
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+
+  FirebaseMessangingRemoteDatasource().firebaseBackgroundHandler(message);
 }
