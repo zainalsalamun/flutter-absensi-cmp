@@ -31,7 +31,6 @@ class _ScannerPageState extends State<ScannerPage> with WidgetsBindingObserver {
   MobileScannerController cameraController = MobileScannerController(
     autoStart: true,
     torchEnabled: false,
-    useNewCameraSelector: true,
   );
 
   Barcode? _barcode;
@@ -180,6 +179,10 @@ class _ScannerPageState extends State<ScannerPage> with WidgetsBindingObserver {
                     icon = const Icon(Icons.camera_front);
                   case CameraFacing.back:
                     icon = const Icon(Icons.camera_rear);
+                  case CameraFacing.external:
+                    icon = const Icon(Icons.camera_rear);
+                  case CameraFacing.unknown:
+                    icon = const Icon(Icons.camera);
                 }
 
                 return IconButton(
