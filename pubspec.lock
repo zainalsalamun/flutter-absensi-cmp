@@ -644,18 +644,18 @@ packages:
     dependency: "direct main"
     description:
       name: google_mlkit_commons
-      sha256: "9990a65f407a3ef6bae646bf10143faa93fec126683771465bc6c0b43fb0e6e9"
+      sha256: "3e69fea4211727732cc385104e675ad1e40b29f12edd492ee52fa108423a6124"
       url: "https://pub.dev"
     source: hosted
-    version: "0.8.1"
+    version: "0.11.1"
   google_mlkit_face_detection:
     dependency: "direct main"
     description:
       name: google_mlkit_face_detection
-      sha256: "0aeab4f39204f7a235ed4cccedfe7e61401b43f4ef139a868c01fa29fdc225ab"
+      sha256: "7b6ddcc69dbd6fbfa313fb2d974ad0f0c3a0d1657560f0da6be465baf1889687"
       url: "https://pub.dev"
     source: hosted
-    version: "0.11.1"
+    version: "0.13.2"
   graphs:
     dependency: transitive
     description:
@@ -940,10 +940,10 @@ packages:
     dependency: "direct main"
     description:
       name: mobile_scanner
-      sha256: d234581c090526676fd8fab4ada92f35c6746e3fb4f05a399665d75a399fb760
+      sha256: c92c26bf2231695b6d3477c8dcf435f51e28f87b1745966b1fe4c47a286171ce
       url: "https://pub.dev"
     source: hosted
-    version: "5.2.3"
+    version: "7.2.0"
   nested:
     dependency: transitive
     description:
@@ -1486,5 +1486,5 @@ packages:
     source: hosted
     version: "3.1.2"
 sdks:
-  dart: ">=3.8.0-0 <4.0.0"
-  flutter: ">=3.22.0"
+  dart: ">=3.8.0 <4.0.0"
+  flutter: ">=3.32.0"
