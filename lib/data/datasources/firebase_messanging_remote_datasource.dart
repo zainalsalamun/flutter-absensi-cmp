@@ -5,10 +5,12 @@ import 'package:flutter_absensi_app/data/datasources/auth_remote_datasource.dart
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class FirebaseMessangingRemoteDatasource {
-  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+  late final FirebaseMessaging _firebaseMessaging;
+
   final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
   Future<void> initialize() async {
+    _firebaseMessaging = FirebaseMessaging.instance;
     await _firebaseMessaging.requestPermission(
       alert: true,
       badge: true,

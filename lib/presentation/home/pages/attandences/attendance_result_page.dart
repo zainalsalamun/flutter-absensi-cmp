@@ -3,14 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_absensi_app/presentation/home/bloc/checkout_attendance/checkout_attendance_bloc.dart';
 import 'package:flutter_absensi_app/presentation/home/pages/attandences/scanner_page.dart';
+import 'package:flutter_absensi_app/presentation/home/pages/attendance_checkout_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
 
 import 'package:flutter_absensi_app/core/core.dart';
 import 'package:flutter_absensi_app/presentation/home/bloc/checkin_attendance/checkin_attendance_bloc.dart';
 import 'package:flutter_absensi_app/presentation/home/pages/attendance_success_page.dart';
-
-import 'face_detector_checkin_page.dart';
 
 class AttendanceResultPage extends StatefulWidget {
   final bool isCheckin;
@@ -52,7 +51,8 @@ class _RecognitionResultPageState extends State<AttendanceResultPage> {
       }
 
       final position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.best);
+        desiredAccuracy: LocationAccuracy.best,
+      );
       if (mounted) {
         setState(() {
           latitude = position.latitude;
@@ -84,10 +84,7 @@ class _RecognitionResultPageState extends State<AttendanceResultPage> {
             ),
             Text(
               widget.isCheckin ? 'Checkin' : 'Checkout',
-              style: TextStyle(
-                fontSize: 12.0,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold),
             ),
             widget.attendanceType == 'Face'
                 ? Text(
@@ -115,16 +112,16 @@ class _RecognitionResultPageState extends State<AttendanceResultPage> {
                       state.maybeWhen(
                         orElse: () {},
                         error: (message) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(message),
-                            ),
-                          );
+                          ScaffoldMessenger.of(
+                            context,
+                          ).showSnackBar(SnackBar(content: Text(message)));
                         },
                         loaded: (responseModel) {
-                          context.pushReplacement(const AttendanceSuccessPage(
-                            status: 'Berhasil Checkin',
-                          ));
+                          context.pushReplacement(
+                            const AttendanceSuccessPage(
+                              status: 'Berhasil Checkin',
+                            ),
+                          );
                         },
                       );
                     },
@@ -139,8 +136,9 @@ class _RecognitionResultPageState extends State<AttendanceResultPage> {
                                   try {
                                     final position =
                                         await Geolocator.getCurrentPosition(
-                                            desiredAccuracy:
-                                                LocationAccuracy.best);
+                                          desiredAccuracy:
+                                              LocationAccuracy.best,
+                                        );
                                     latitude = position.latitude;
                                     longitude = position.longitude;
                                   } catch (e) {
@@ -152,111 +150,94 @@ class _RecognitionResultPageState extends State<AttendanceResultPage> {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
                                       content: Text(
-                                          'Lokasi belum ditemukan, pastikan GPS aktif.'),
+                                        'Lokasi belum ditemukan, pastikan GPS aktif.',
+                                      ),
                                       backgroundColor: Colors.red,
                                     ),
                                   );
                                   return;
                                 }
                                 context.read<CheckinAttendanceBloc>().add(
-                                      CheckinAttendanceEvent.checkin(
-                                          latitude.toString(),
-                                          longitude.toString()),
-                                    );
+                                  CheckinAttendanceEvent.checkin(
+                                    latitude.toString(),
+                                    longitude.toString(),
+                                  ),
+                                );
                               },
                               label: 'Lanjutkan Checkin',
                             ),
                           );
                         },
-                        loading: () => const Center(
-                          child: CircularProgressIndicator(),
-                        ),
+                        loading: () =>
+                            const Center(child: CircularProgressIndicator()),
                       );
                     },
                   )
                 : !widget.isCheckin && widget.isMatch
-                    ? BlocConsumer<CheckoutAttendanceBloc,
-                        CheckoutAttendanceState>(
-                        listener: (context, state) {
-                          state.maybeWhen(
-                            orElse: () {},
-                            error: (message) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(message),
-                                ),
-                              );
-                            },
-                            loaded: (responseModel) {
-                              context
-                                  .pushReplacement(const AttendanceSuccessPage(
-                                status: 'Berhasil Checkout',
-                              ));
-                            },
-                          );
+                ? BlocConsumer<CheckoutAttendanceBloc, CheckoutAttendanceState>(
+                    listener: (context, state) {
+                      state.maybeWhen(
+                        orElse: () {},
+                        error: (message) {
+                          ScaffoldMessenger.of(
+                            context,
+                          ).showSnackBar(SnackBar(content: Text(message)));
                         },
-                        builder: (context, state) {
-                          return state.maybeWhen(
-                            orElse: () {
-                              return Padding(
-                                padding: const EdgeInsets.all(16),
-                                child: Button.filled(
-                                  onPressed: () async {
-                                    if (latitude == null || longitude == null) {
-                                      try {
-                                        final position =
-                                            await Geolocator.getCurrentPosition(
-                                                desiredAccuracy:
-                                                    LocationAccuracy.best);
-                                        latitude = position.latitude;
-                                        longitude = position.longitude;
-                                      } catch (e) {
-                                        // ignore
-                                      }
-                                    }
-
-                                    if (latitude == null || longitude == null) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              'Lokasi belum ditemukan, pastikan GPS aktif.'),
-                                          backgroundColor: Colors.red,
-                                        ),
-                                      );
-                                      return;
-                                    }
-                                    context.read<CheckoutAttendanceBloc>().add(
-                                          CheckoutAttendanceEvent.checkout(
-                                              latitude.toString(),
-                                              longitude.toString()),
-                                        );
-                                  },
-                                  label: 'Lanjutkan Checkout',
-                                ),
-                              );
-                            },
-                            loading: () => const Center(
-                              child: CircularProgressIndicator(),
+                        loaded: (responseModel) {
+                          context.pushReplacement(
+                            const AttendanceSuccessPage(
+                              status: 'Berhasil Checkout',
                             ),
                           );
                         },
-                      )
-                    : const SizedBox(),
-            //coba lagi
-            widget.attendanceType == 'Face'
-                ? ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => FaceDetectorCheckinPage(
-                                    isCheckedIn: widget.isCheckin,
-                                  )));
+                      );
                     },
-                    child: Text('Ambil Wajah Lagi'),
+                    builder: (context, state) {
+                      return state.maybeWhen(
+                        orElse: () {
+                          return Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Button.filled(
+                              onPressed: () async {
+                                if (latitude == null || longitude == null) {
+                                  try {
+                                    final position =
+                                        await Geolocator.getCurrentPosition(
+                                          desiredAccuracy:
+                                              LocationAccuracy.best,
+                                        );
+                                    latitude = position.latitude;
+                                    longitude = position.longitude;
+                                  } catch (e) {
+                                    // ignore
+                                  }
+                                }
+
+                                if (latitude == null || longitude == null) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        'Lokasi belum ditemukan, pastikan GPS aktif.',
+                                      ),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                  return;
+                                }
+                                context.push(const AttendanceCheckoutPage());
+                              },
+                              label: 'Lanjutkan Checkout',
+                            ),
+                          );
+                        },
+                        loading: () =>
+                            const Center(child: CircularProgressIndicator()),
+                      );
+                    },
                   )
                 : const SizedBox(),
+
+            //coba lagi
             widget.attendanceType == 'QR'
                 ? ElevatedButton(
                     onPressed: () {
