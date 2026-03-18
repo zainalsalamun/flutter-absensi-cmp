@@ -1,4 +1,4 @@
-package com.naltech.attendance
+package com.attendance.cmp
 
 import io.flutter.embedding.android.FlutterActivity
 
