@@ -19,38 +19,38 @@ mixin _$CheckoutAttendanceEvent {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() started,
-    required TResult Function(String latitute, String longitude) checkout,
+    required TResult Function(CheckInOutRequestModel request) checkoutWithPhoto,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? started,
-    TResult? Function(String latitute, String longitude)? checkout,
+    TResult? Function(CheckInOutRequestModel request)? checkoutWithPhoto,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? started,
-    TResult Function(String latitute, String longitude)? checkout,
+    TResult Function(CheckInOutRequestModel request)? checkoutWithPhoto,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_Started value) started,
-    required TResult Function(_Checkout value) checkout,
+    required TResult Function(_CheckoutWithPhoto value) checkoutWithPhoto,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_Started value)? started,
-    TResult? Function(_Checkout value)? checkout,
+    TResult? Function(_CheckoutWithPhoto value)? checkoutWithPhoto,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_Started value)? started,
-    TResult Function(_Checkout value)? checkout,
+    TResult Function(_CheckoutWithPhoto value)? checkoutWithPhoto,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -114,7 +114,7 @@ class _$StartedImpl implements _Started {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() started,
-    required TResult Function(String latitute, String longitude) checkout,
+    required TResult Function(CheckInOutRequestModel request) checkoutWithPhoto,
   }) {
     return started();
   }
@@ -123,7 +123,7 @@ class _$StartedImpl implements _Started {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? started,
-    TResult? Function(String latitute, String longitude)? checkout,
+    TResult? Function(CheckInOutRequestModel request)? checkoutWithPhoto,
   }) {
     return started?.call();
   }
@@ -132,7 +132,7 @@ class _$StartedImpl implements _Started {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? started,
-    TResult Function(String latitute, String longitude)? checkout,
+    TResult Function(CheckInOutRequestModel request)? checkoutWithPhoto,
     required TResult orElse(),
   }) {
     if (started != null) {
@@ -145,7 +145,7 @@ class _$StartedImpl implements _Started {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_Started value) started,
-    required TResult Function(_Checkout value) checkout,
+    required TResult Function(_CheckoutWithPhoto value) checkoutWithPhoto,
   }) {
     return started(this);
   }
@@ -154,7 +154,7 @@ class _$StartedImpl implements _Started {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_Started value)? started,
-    TResult? Function(_Checkout value)? checkout,
+    TResult? Function(_CheckoutWithPhoto value)? checkoutWithPhoto,
   }) {
     return started?.call(this);
   }
@@ -163,7 +163,7 @@ class _$StartedImpl implements _Started {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_Started value)? started,
-    TResult Function(_Checkout value)? checkout,
+    TResult Function(_CheckoutWithPhoto value)? checkoutWithPhoto,
     required TResult orElse(),
   }) {
     if (started != null) {
@@ -178,103 +178,94 @@ abstract class _Started implements CheckoutAttendanceEvent {
 }
 
 /// @nodoc
-abstract class _$$CheckoutImplCopyWith<$Res> {
-  factory _$$CheckoutImplCopyWith(
-          _$CheckoutImpl value, $Res Function(_$CheckoutImpl) then) =
-      __$$CheckoutImplCopyWithImpl<$Res>;
+abstract class _$$CheckoutWithPhotoImplCopyWith<$Res> {
+  factory _$$CheckoutWithPhotoImplCopyWith(_$CheckoutWithPhotoImpl value,
+          $Res Function(_$CheckoutWithPhotoImpl) then) =
+      __$$CheckoutWithPhotoImplCopyWithImpl<$Res>;
   @useResult
-  $Res call({String latitute, String longitude});
+  $Res call({CheckInOutRequestModel request});
 }
 
 /// @nodoc
-class __$$CheckoutImplCopyWithImpl<$Res>
-    extends _$CheckoutAttendanceEventCopyWithImpl<$Res, _$CheckoutImpl>
-    implements _$$CheckoutImplCopyWith<$Res> {
-  __$$CheckoutImplCopyWithImpl(
-      _$CheckoutImpl _value, $Res Function(_$CheckoutImpl) _then)
+class __$$CheckoutWithPhotoImplCopyWithImpl<$Res>
+    extends _$CheckoutAttendanceEventCopyWithImpl<$Res, _$CheckoutWithPhotoImpl>
+    implements _$$CheckoutWithPhotoImplCopyWith<$Res> {
+  __$$CheckoutWithPhotoImplCopyWithImpl(_$CheckoutWithPhotoImpl _value,
+      $Res Function(_$CheckoutWithPhotoImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? latitute = null,
-    Object? longitude = null,
+    Object? request = null,
   }) {
-    return _then(_$CheckoutImpl(
-      null == latitute
-          ? _value.latitute
-          : latitute // ignore: cast_nullable_to_non_nullable
-              as String,
-      null == longitude
-          ? _value.longitude
-          : longitude // ignore: cast_nullable_to_non_nullable
-              as String,
+    return _then(_$CheckoutWithPhotoImpl(
+      null == request
+          ? _value.request
+          : request // ignore: cast_nullable_to_non_nullable
+              as CheckInOutRequestModel,
     ));
   }
 }
 
 /// @nodoc
 
-class _$CheckoutImpl implements _Checkout {
-  const _$CheckoutImpl(this.latitute, this.longitude);
+class _$CheckoutWithPhotoImpl implements _CheckoutWithPhoto {
+  const _$CheckoutWithPhotoImpl(this.request);
 
   @override
-  final String latitute;
-  @override
-  final String longitude;
+  final CheckInOutRequestModel request;
 
   @override
   String toString() {
-    return 'CheckoutAttendanceEvent.checkout(latitute: $latitute, longitude: $longitude)';
+    return 'CheckoutAttendanceEvent.checkoutWithPhoto(request: $request)';
   }
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$CheckoutImpl &&
-            (identical(other.latitute, latitute) ||
-                other.latitute == latitute) &&
-            (identical(other.longitude, longitude) ||
-                other.longitude == longitude));
+            other is _$CheckoutWithPhotoImpl &&
+            (identical(other.request, request) || other.request == request));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, latitute, longitude);
+  int get hashCode => Object.hash(runtimeType, request);
 
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$CheckoutImplCopyWith<_$CheckoutImpl> get copyWith =>
-      __$$CheckoutImplCopyWithImpl<_$CheckoutImpl>(this, _$identity);
+  _$$CheckoutWithPhotoImplCopyWith<_$CheckoutWithPhotoImpl> get copyWith =>
+      __$$CheckoutWithPhotoImplCopyWithImpl<_$CheckoutWithPhotoImpl>(
+          this, _$identity);
 
   @override
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() started,
-    required TResult Function(String latitute, String longitude) checkout,
+    required TResult Function(CheckInOutRequestModel request) checkoutWithPhoto,
   }) {
-    return checkout(latitute, longitude);
+    return checkoutWithPhoto(request);
   }
 
   @override
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? started,
-    TResult? Function(String latitute, String longitude)? checkout,
+    TResult? Function(CheckInOutRequestModel request)? checkoutWithPhoto,
   }) {
-    return checkout?.call(latitute, longitude);
+    return checkoutWithPhoto?.call(request);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? started,
-    TResult Function(String latitute, String longitude)? checkout,
+    TResult Function(CheckInOutRequestModel request)? checkoutWithPhoto,
     required TResult orElse(),
   }) {
-    if (checkout != null) {
-      return checkout(latitute, longitude);
+    if (checkoutWithPhoto != null) {
+      return checkoutWithPhoto(request);
     }
     return orElse();
   }
@@ -283,42 +274,41 @@ class _$CheckoutImpl implements _Checkout {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_Started value) started,
-    required TResult Function(_Checkout value) checkout,
+    required TResult Function(_CheckoutWithPhoto value) checkoutWithPhoto,
   }) {
-    return checkout(this);
+    return checkoutWithPhoto(this);
   }
 
   @override
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_Started value)? started,
-    TResult? Function(_Checkout value)? checkout,
+    TResult? Function(_CheckoutWithPhoto value)? checkoutWithPhoto,
   }) {
-    return checkout?.call(this);
+    return checkoutWithPhoto?.call(this);
   }
 
   @override
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_Started value)? started,
-    TResult Function(_Checkout value)? checkout,
+    TResult Function(_CheckoutWithPhoto value)? checkoutWithPhoto,
     required TResult orElse(),
   }) {
-    if (checkout != null) {
-      return checkout(this);
+    if (checkoutWithPhoto != null) {
+      return checkoutWithPhoto(this);
     }
     return orElse();
   }
 }
 
-abstract class _Checkout implements CheckoutAttendanceEvent {
-  const factory _Checkout(final String latitute, final String longitude) =
-      _$CheckoutImpl;
+abstract class _CheckoutWithPhoto implements CheckoutAttendanceEvent {
+  const factory _CheckoutWithPhoto(final CheckInOutRequestModel request) =
+      _$CheckoutWithPhotoImpl;
 
-  String get latitute;
-  String get longitude;
+  CheckInOutRequestModel get request;
   @JsonKey(ignore: true)
-  _$$CheckoutImplCopyWith<_$CheckoutImpl> get copyWith =>
+  _$$CheckoutWithPhotoImplCopyWith<_$CheckoutWithPhotoImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
