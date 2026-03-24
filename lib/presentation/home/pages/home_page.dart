@@ -5,11 +5,9 @@ import 'package:flutter_absensi_app/core/helper/radius_calculate.dart';
 import 'package:flutter_absensi_app/data/datasources/auth_local_datasource.dart';
 import 'package:flutter_absensi_app/presentation/home/bloc/get_company/get_company_bloc.dart';
 import 'package:flutter_absensi_app/presentation/home/bloc/is_checkedin/is_checkedin_bloc.dart';
-import 'package:flutter_absensi_app/presentation/home/pages/attandences/face_detector_checkin_page.dart';
 import 'package:flutter_absensi_app/presentation/home/pages/attandences/attendance_result_page.dart';
 import 'package:flutter_absensi_app/presentation/home/pages/attandences/scanner_page.dart';
 import 'package:flutter_absensi_app/presentation/home/pages/attendance_checkout_page.dart';
-import 'package:flutter_absensi_app/presentation/home/pages/face_detector_view.dart';
 import 'package:flutter_absensi_app/presentation/home/pages/permission_page.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -29,15 +27,12 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  String? faceEmbedding;
-
   @override
   void initState() {
-    _initializeFaceEmbedding();
+    super.initState();
     context.read<IsCheckedinBloc>().add(const IsCheckedinEvent.isCheckedIn());
     context.read<GetCompanyBloc>().add(const GetCompanyEvent.getCompany());
     context.read<GetUserBloc>().add(const GetUserEvent.getUser());
-    super.initState();
     getCurrentPosition();
   }
 
@@ -86,19 +81,20 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<void> _initializeFaceEmbedding() async {
-    try {
-      final authData = await AuthLocalDatasource().getAuthData();
-      setState(() {
-        faceEmbedding = authData?.user?.faceEmbedding;
-      });
-    } catch (e) {
-      // Tangani error di sini jika ada masalah dalam mendapatkan authData
-      print('Error fetching auth data: $e');
-      setState(() {
-        faceEmbedding = null; // Atur faceEmbedding ke null jika ada kesalahan
-      });
-    }
+  Future<void> _showWarningDialog(String message) async {
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Peringatan'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -296,8 +292,8 @@ class _HomePageState extends State<HomePage> {
                                           BoxShadow(
                                             color: AppColors.black
                                                 .withOpacity(0.05),
-                                            blurRadius: 10.0,
-                                            offset: const Offset(0, 2),
+                                            blurRadius: 20.0,
+                                            offset: const Offset(0, 8),
                                           ),
                                         ],
                                       ),
@@ -422,8 +418,10 @@ class _HomePageState extends State<HomePage> {
                             } else {
                               if (attendanceType == 'Face') {
                                 context.push(
-                                  const FaceDetectorCheckinPage(
-                                    isCheckedIn: true,
+                                  AttendanceResultPage(
+                                    isCheckin: true,
+                                    isMatch: true,
+                                    attendanceType: attendanceType,
                                   ),
                                 );
                               } else if (attendanceType == 'QR') {
@@ -514,8 +512,10 @@ class _HomePageState extends State<HomePage> {
                             } else {
                               if (attendanceType == 'Face') {
                                 context.push(
-                                  const FaceDetectorCheckinPage(
-                                    isCheckedIn: false,
+                                  AttendanceResultPage(
+                                    isCheckin: false,
+                                    isMatch: true,
+                                    attendanceType: attendanceType,
                                   ),
                                 );
                               } else if (attendanceType == 'QR') {
@@ -546,12 +546,6 @@ class _HomePageState extends State<HomePage> {
                     context.push(const PermissionPage());
                   },
                 ),
-                // MenuButton(
-                //   label: 'Catatan',
-                //   iconData: Icons.my_library_books_rounded,
-                //   foregroundColor: Colors.orange,
-                //   onPressed: () {},
-                // ),
                 MenuButton(
                   label: 'Reimbursement',
                   iconData: Icons.receipt_long,
@@ -562,397 +556,9 @@ class _HomePageState extends State<HomePage> {
                 ),
               ],
             ),
-            const SpaceHeight(12.0),
-            faceEmbedding != null
-                ? BlocBuilder<IsCheckedinBloc, IsCheckedinState>(
-                    builder: (context, state) {
-                      final isCheckout = state.maybeWhen(
-                        orElse: () => false,
-                        success: (data) => data.isCheckedout,
-                      );
-                      final isCheckIn = state.maybeWhen(
-                        orElse: () => false,
-                        success: (data) => data.isCheckedin,
-                      );
-                      return BlocBuilder<GetCompanyBloc, GetCompanyState>(
-                        builder: (context, state) {
-                          final latitudePoint = state.maybeWhen(
-                            orElse: () => 0.0,
-                            success: (data) => double.parse(data.latitude!),
-                          );
-                          final longitudePoint = state.maybeWhen(
-                            orElse: () => 0.0,
-                            success: (data) => double.parse(data.longitude!),
-                          );
-
-                          final radiusPoint = state.maybeWhen(
-                            orElse: () => 0.0,
-                            success: (data) => double.parse(data.radiusKm!),
-                          );
-                          return Container(
-                            margin: const EdgeInsets.symmetric(
-                              horizontal: 16.0,
-                            ),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(24.0),
-                              gradient: LinearGradient(
-                                colors: [
-                                  AppColors.primary,
-                                  const Color(0xFF2E5BFF),
-                                ],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppColors.primary.withOpacity(0.4),
-                                  blurRadius: 20.0,
-                                  offset: const Offset(0, 8),
-                                ),
-                              ],
-                            ),
-                            child: Material(
-                              color: Colors.transparent,
-                              borderRadius: BorderRadius.circular(24.0),
-                              child: InkWell(
-                                onTap: () async {
-                                  final position =
-                                      await Geolocator.getCurrentPosition();
-
-                                  if (position.isMocked) {
-                                    ScaffoldMessenger.of(
-                                      context,
-                                    ).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                          'Anda menggunakan lokasi palsu',
-                                        ),
-                                        backgroundColor: AppColors.red,
-                                      ),
-                                    );
-                                    return;
-                                  }
-
-                                  final distanceKm =
-                                      RadiusCalculate.calculateDistance(
-                                    position.latitude,
-                                    position.longitude,
-                                    latitudePoint,
-                                    longitudePoint,
-                                  );
-
-                                  print('jarak radius:  $distanceKm');
-
-                                  if (distanceKm > (radiusPoint + 0.05)) {
-                                    ScaffoldMessenger.of(
-                                      context,
-                                    ).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          'Anda diluar jangkauan absen ($distanceKm km dari kantor)',
-                                        ),
-                                        backgroundColor: AppColors.red,
-                                      ),
-                                    );
-                                    return;
-                                  }
-
-                                  if (!isCheckIn) {
-                                    context.push(
-                                      const FaceDetectorCheckinPage(
-                                        isCheckedIn: true,
-                                      ),
-                                    );
-                                  } else if (!isCheckout) {
-                                    context.push(
-                                      const AttendanceCheckoutPage(),
-                                    );
-                                  } else {
-                                    ScaffoldMessenger.of(
-                                      context,
-                                    ).showSnackBar(
-                                      const SnackBar(
-                                        content: Text('Anda sudah checkout'),
-                                        backgroundColor: AppColors.red,
-                                      ),
-                                    );
-                                  }
-                                },
-                                borderRadius: BorderRadius.circular(24.0),
-                                splashColor: Colors.white.withOpacity(0.1),
-                                highlightColor: Colors.white.withOpacity(
-                                  0.05,
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 24.0,
-                                    vertical: 16.0,
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              isCheckIn
-                                                  ? 'Daily Check-out'
-                                                  : 'Daily Check-in',
-                                              style: const TextStyle(
-                                                color: Colors.white70,
-                                                fontSize: 14.0,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                            const SpaceHeight(4.0),
-                                            Text(
-                                              isCheckIn
-                                                  ? 'Attendance Check-out Using Face ID'
-                                                  : 'Attendance Check-in Using Face ID',
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 18.0,
-                                                fontWeight: FontWeight.w700,
-                                                letterSpacing: -0.5,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      const SpaceWidth(16.0),
-                                      Container(
-                                        padding: const EdgeInsets.all(16.0),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white.withOpacity(
-                                            0.2,
-                                          ),
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: Assets.icons.attendance.svg(
-                                          width: 32.0,
-                                          height: 32.0,
-                                          colorFilter: const ColorFilter.mode(
-                                            Colors.white,
-                                            BlendMode.srcIn,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      );
-                    },
-                  )
-                : Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 16.0),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(24.0),
-                      gradient: LinearGradient(
-                        colors: [
-                          AppColors.primary,
-                          AppColors.primary.withOpacity(0.8),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.primary.withOpacity(0.3),
-                          blurRadius: 20.0,
-                          offset: const Offset(0, 8),
-                        ),
-                      ],
-                    ),
-                    child: Material(
-                      color: Colors.transparent,
-                      borderRadius: BorderRadius.circular(24.0),
-                      child: InkWell(
-                        onTap: () {
-                          showBottomSheet(
-                            backgroundColor: AppColors.white,
-                            context: context,
-                            builder: (context) => Container(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const SizedBox(
-                                    width: 60.0,
-                                    height: 8.0,
-                                    child: Divider(
-                                      color: AppColors.lightSheet,
-                                    ),
-                                  ),
-                                  const CloseButton(),
-                                  const Center(
-                                    child: Text(
-                                      'Oops !',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 24.0,
-                                      ),
-                                    ),
-                                  ),
-                                  const SpaceHeight(4.0),
-                                  const Center(
-                                    child: Text(
-                                      'Aplikasi ingin mengakses Kamera',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 15.0,
-                                      ),
-                                    ),
-                                  ),
-                                  const SpaceHeight(36.0),
-                                  Button.filled(
-                                    onPressed: () => context.pop(),
-                                    label: 'Tolak',
-                                    color: AppColors.secondary,
-                                  ),
-                                  const SpaceHeight(16.0),
-                                  Button.filled(
-                                    onPressed: () {
-                                      context.pop();
-                                      context.push(const FaceDetectorView());
-                                    },
-                                    label: 'Izinkan',
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                        borderRadius: BorderRadius.circular(24.0),
-                        splashColor: Colors.white.withOpacity(0.1),
-                        highlightColor: Colors.white.withOpacity(0.05),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 24.0,
-                            vertical: 16.0,
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'New Member?',
-                                      style: TextStyle(
-                                        color: Colors.white70,
-                                        fontSize: 14.0,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    SpaceHeight(4.0),
-                                    Text(
-                                      'Daftarkan Wajah',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 18.0,
-                                        fontWeight: FontWeight.w700,
-                                        letterSpacing: -0.5,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SpaceWidth(16.0),
-                              Container(
-                                padding: const EdgeInsets.all(16.0),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.2),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Assets.icons.attendance.svg(
-                                  width: 32.0,
-                                  height: 32.0,
-                                  colorFilter: const ColorFilter.mode(
-                                    Colors.white,
-                                    BlendMode.srcIn,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-            const SpaceHeight(20.0),
           ],
         ),
       ),
-    );
-  }
-
-  void _showWarningDialog(String message) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor: AppColors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24.0),
-          ),
-          contentPadding: const EdgeInsets.all(32.0),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(20.0),
-                decoration: BoxDecoration(
-                  color: AppColors.red.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.warning_amber_rounded,
-                  color: AppColors.red,
-                  size: 48.0,
-                ),
-              ),
-              const SpaceHeight(24.0),
-              const Text(
-                'Peringatan !',
-                style: TextStyle(
-                  fontSize: 22.0,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.black,
-                  letterSpacing: -0.5,
-                ),
-              ),
-              const SpaceHeight(12.0),
-              Text(
-                message,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 16.0,
-                  color: AppColors.grey,
-                  fontWeight: FontWeight.w500,
-                  height: 1.4,
-                ),
-              ),
-              const SpaceHeight(32.0),
-              SizedBox(
-                width: double.infinity,
-                child: Button.filled(
-                  onPressed: () => Navigator.pop(context),
-                  label: 'Saya Mengerti',
-                ),
-              ),
-            ],
-          ),
-        );
-      },
     );
   }
 }
