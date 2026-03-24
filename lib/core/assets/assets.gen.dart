@@ -67,8 +67,16 @@ class $AssetsIconsGen {
 class $AssetsImagesGen {
   const $AssetsImagesGen();
 
+  /// File path: assets/images/app_icon.png
+  AssetGenImage get appIcon =>
+      const AssetGenImage('assets/images/app_icon.png');
+
   /// File path: assets/images/bg_home.png
   AssetGenImage get bgHome => const AssetGenImage('assets/images/bg_home.png');
+
+  /// File path: assets/images/face_attendance_logo.png
+  AssetGenImage get faceAttendanceLogo =>
+      const AssetGenImage('assets/images/face_attendance_logo.png');
 
   /// File path: assets/images/failed.png
   AssetGenImage get failed => const AssetGenImage('assets/images/failed.png');
@@ -92,18 +100,30 @@ class $AssetsImagesGen {
   AssetGenImage get seeLocation =>
       const AssetGenImage('assets/images/see_location.png');
 
+  /// File path: assets/images/smart_attendance_app_icon.png
+  AssetGenImage get smartAttendanceAppIcon =>
+      const AssetGenImage('assets/images/smart_attendance_app_icon.png');
+
+  /// File path: assets/images/smart_attendance_logo.png
+  AssetGenImage get smartAttendanceLogo =>
+      const AssetGenImage('assets/images/smart_attendance_logo.png');
+
   /// File path: assets/images/success.png
   AssetGenImage get success => const AssetGenImage('assets/images/success.png');
 
   /// List of all assets
   List<AssetGenImage> get values => [
+        appIcon,
         bgHome,
+        faceAttendanceLogo,
         failed,
         imgMyLocation,
         logo,
         logoCodeWithBahri,
         logoWhite,
         seeLocation,
+        smartAttendanceAppIcon,
+        smartAttendanceLogo,
         success
       ];
 }
