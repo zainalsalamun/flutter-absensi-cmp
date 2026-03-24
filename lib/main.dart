@@ -17,7 +17,7 @@ import 'package:flutter_absensi_app/presentation/home/bloc/get_company/get_compa
 import 'package:flutter_absensi_app/presentation/home/bloc/get_qrcode_checkin/get_qrcode_checkin_bloc.dart';
 import 'package:flutter_absensi_app/presentation/home/bloc/get_qrcode_checkout/get_qrcode_checkout_bloc.dart';
 import 'package:flutter_absensi_app/presentation/home/bloc/is_checkedin/is_checkedin_bloc.dart';
-import 'package:flutter_absensi_app/presentation/home/bloc/update_user_register_face/update_user_register_face_bloc.dart';
+import 'package:flutter_absensi_app/presentation/home/bloc/update_profile_image/update_user_register_face_bloc.dart';
 import 'package:flutter_absensi_app/presentation/profile/bloc/get_user/get_user_bloc.dart';
 import 'package:flutter_absensi_app/presentation/profile/bloc/update_user/update_user_bloc.dart';
 import 'package:flutter_absensi_app/data/datasources/reimbursement_remote_datasource.dart';
@@ -61,7 +61,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create: (context) => LogoutBloc(AuthRemoteDatasource()),
         ),
-        BlocProvider(
+        BlocProvider<UpdateUserRegisterFaceBloc>(
           create: (context) =>
               UpdateUserRegisterFaceBloc(AuthRemoteDatasource()),
         ),
