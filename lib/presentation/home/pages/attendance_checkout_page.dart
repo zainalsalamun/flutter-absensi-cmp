@@ -1,13 +1,16 @@
 import 'dart:io';
+import 'dart:convert';
+import 'dart:typed_data';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:geolocator/geolocator.dart.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../presentation/home/bloc/checkout_attendance/checkout_attendance_bloc.dart';
-import '../../presentation/home/pages/attendance_success_page.dart';
-import '../../presentation/home/pages/location_page.dart';
+import '../../../presentation/home/bloc/checkout_attendance/checkout_attendance_bloc.dart';
+import '../../../presentation/home/pages/attendance_success_page.dart';
+import '../../../presentation/home/pages/location_page.dart';
 import '../../../core/core.dart';
+import '../../../data/models/request/checkinout_request_model.dart';
 
 class AttendanceCheckoutPage extends StatefulWidget {
   const AttendanceCheckoutPage({super.key});
@@ -127,16 +130,18 @@ class _AttendanceCheckoutPageState extends State<AttendanceCheckoutPage> {
 
     // Convert photo to multipart file
     final photoFile = File(_capturedPhoto!.path);
+    final Uint8List photoBytes = await photoFile.readAsBytes();
+    final String base64Photo = base64Encode(photoBytes);
     final request = CheckInOutRequestModel(
       latitude: latitude.toString(),
       longitude: longitude.toString(),
-      photo: await photoFile.readAsBytes(),
+      photo: base64Photo,
     );
 
     if (mounted) {
       context.read<CheckoutAttendanceBloc>().add(
-        CheckoutAttendanceEvent.checkoutWithPhoto(request),
-      );
+            CheckoutAttendanceEvent.checkoutWithPhoto(request),
+          );
     }
   }
 
@@ -295,10 +300,8 @@ class _AttendanceCheckoutPageState extends State<AttendanceCheckoutPage> {
                           icon: Assets.icons.reverse.svg(width: 48.0),
                         ),
                         const Spacer(),
-                        BlocConsumer<
-                          CheckoutAttendanceBloc,
-                          CheckoutAttendanceState
-                        >(
+                        BlocConsumer<CheckoutAttendanceBloc,
+                            CheckoutAttendanceState>(
                           listener: (context, state) {
                             state.maybeWhen(
                               orElse: () {},
