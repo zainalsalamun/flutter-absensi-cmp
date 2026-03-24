@@ -1,8 +1,8 @@
 import 'package:bloc/bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:flutter_absensi_app/data/models/response/reimbursement_response_model.dart';
 
 import '../../../../../data/datasources/reimbursement_remote_datasource.dart';
-import '../../../../../data/models/response/reimbursement_response_model.dart';
 
 part 'get_reimbursements_bloc.freezed.dart';
 part 'get_reimbursements_event.dart';
@@ -21,7 +21,7 @@ class GetReimbursementsBloc
         final result = await datasource.getReimbursements();
         result.fold(
           (l) => emit(_Error(l)),
-          (r) => emit(_Success(r.data ?? [])),
+          (r) => emit(_Success(r)),
         );
       },
     );
