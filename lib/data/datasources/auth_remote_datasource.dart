@@ -10,7 +10,9 @@ import '../models/response/user_response_model.dart';
 
 class AuthRemoteDatasource {
   Future<Either<String, AuthResponseModel>> login(
-      String username, String password) async {
+    String username,
+    String password,
+  ) async {
     final url = Uri.parse('${Variables.baseUrl}/api/login');
     final response = await http.post(
       url,
@@ -18,10 +20,7 @@ class AuthRemoteDatasource {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
-      body: jsonEncode({
-        'email': username,
-        'password': password,
-      }),
+      body: jsonEncode({'email': username, 'password': password}),
     );
 
     if (response.statusCode == 200) {
@@ -50,7 +49,8 @@ class AuthRemoteDatasource {
         return const Right('Logout success');
       } else {
         return const Right(
-            'Logout success'); // Force success so they can leave the page
+          'Logout success',
+        ); // Force success so they can leave the page
       }
     } catch (e) {
       await AuthLocalDatasource().removeAuthData();
@@ -58,14 +58,15 @@ class AuthRemoteDatasource {
     }
   }
 
-  Future<Either<String, UserResponseModel>> updateProfileRegisterFace(
-    String embedding,
+  Future<Either<String, UserResponseModel>> updateProfileImage(
+    String imagePath,
   ) async {
     final authData = await AuthLocalDatasource().getAuthData();
     final url = Uri.parse('${Variables.baseUrl}/api/update-profile');
+
     final request = http.MultipartRequest('POST', url)
       ..headers['Authorization'] = 'Bearer ${authData?.token}'
-      ..fields['face_embedding'] = embedding;
+      ..files.add(await http.MultipartFile.fromPath('image', imagePath));
 
     final response = await request.send();
     final responseString = await response.stream.bytesToString();
@@ -87,9 +88,7 @@ class AuthRemoteDatasource {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ${authData?.token}',
       },
-      body: jsonEncode({
-        'fcm_token': fcmToken,
-      }),
+      body: jsonEncode({'fcm_token': fcmToken}),
     );
   }
 }
