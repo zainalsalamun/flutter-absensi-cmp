@@ -27,5 +27,14 @@ class CheckinAttendanceBloc
         (r) => emit(_Loaded(r)),
       );
     });
+
+    on<_CheckinWithPhoto>((event, emit) async {
+      emit(const _Loading());
+      final result = await datasource.checkin(event.request);
+      result.fold(
+        (l) => emit(_Error(l)),
+        (r) => emit(_Loaded(r)),
+      );
+    });
   }
 }
