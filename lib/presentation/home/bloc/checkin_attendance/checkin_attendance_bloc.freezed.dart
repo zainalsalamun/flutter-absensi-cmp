@@ -20,18 +20,21 @@ mixin _$CheckinAttendanceEvent {
   TResult when<TResult extends Object?>({
     required TResult Function() started,
     required TResult Function(String latitute, String longitude) checkin,
+    required TResult Function(CheckInOutRequestModel request) checkinWithPhoto,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? started,
     TResult? Function(String latitute, String longitude)? checkin,
+    TResult? Function(CheckInOutRequestModel request)? checkinWithPhoto,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? started,
     TResult Function(String latitute, String longitude)? checkin,
+    TResult Function(CheckInOutRequestModel request)? checkinWithPhoto,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -39,18 +42,21 @@ mixin _$CheckinAttendanceEvent {
   TResult map<TResult extends Object?>({
     required TResult Function(_Started value) started,
     required TResult Function(_Checkin value) checkin,
+    required TResult Function(_CheckinWithPhoto value) checkinWithPhoto,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_Started value)? started,
     TResult? Function(_Checkin value)? checkin,
+    TResult? Function(_CheckinWithPhoto value)? checkinWithPhoto,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_Started value)? started,
     TResult Function(_Checkin value)? checkin,
+    TResult Function(_CheckinWithPhoto value)? checkinWithPhoto,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -115,6 +121,7 @@ class _$StartedImpl implements _Started {
   TResult when<TResult extends Object?>({
     required TResult Function() started,
     required TResult Function(String latitute, String longitude) checkin,
+    required TResult Function(CheckInOutRequestModel request) checkinWithPhoto,
   }) {
     return started();
   }
@@ -124,6 +131,7 @@ class _$StartedImpl implements _Started {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? started,
     TResult? Function(String latitute, String longitude)? checkin,
+    TResult? Function(CheckInOutRequestModel request)? checkinWithPhoto,
   }) {
     return started?.call();
   }
@@ -133,6 +141,7 @@ class _$StartedImpl implements _Started {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? started,
     TResult Function(String latitute, String longitude)? checkin,
+    TResult Function(CheckInOutRequestModel request)? checkinWithPhoto,
     required TResult orElse(),
   }) {
     if (started != null) {
@@ -146,6 +155,7 @@ class _$StartedImpl implements _Started {
   TResult map<TResult extends Object?>({
     required TResult Function(_Started value) started,
     required TResult Function(_Checkin value) checkin,
+    required TResult Function(_CheckinWithPhoto value) checkinWithPhoto,
   }) {
     return started(this);
   }
@@ -155,6 +165,7 @@ class _$StartedImpl implements _Started {
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_Started value)? started,
     TResult? Function(_Checkin value)? checkin,
+    TResult? Function(_CheckinWithPhoto value)? checkinWithPhoto,
   }) {
     return started?.call(this);
   }
@@ -164,6 +175,7 @@ class _$StartedImpl implements _Started {
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_Started value)? started,
     TResult Function(_Checkin value)? checkin,
+    TResult Function(_CheckinWithPhoto value)? checkinWithPhoto,
     required TResult orElse(),
   }) {
     if (started != null) {
@@ -253,6 +265,7 @@ class _$CheckinImpl implements _Checkin {
   TResult when<TResult extends Object?>({
     required TResult Function() started,
     required TResult Function(String latitute, String longitude) checkin,
+    required TResult Function(CheckInOutRequestModel request) checkinWithPhoto,
   }) {
     return checkin(latitute, longitude);
   }
@@ -262,6 +275,7 @@ class _$CheckinImpl implements _Checkin {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? started,
     TResult? Function(String latitute, String longitude)? checkin,
+    TResult? Function(CheckInOutRequestModel request)? checkinWithPhoto,
   }) {
     return checkin?.call(latitute, longitude);
   }
@@ -271,6 +285,7 @@ class _$CheckinImpl implements _Checkin {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? started,
     TResult Function(String latitute, String longitude)? checkin,
+    TResult Function(CheckInOutRequestModel request)? checkinWithPhoto,
     required TResult orElse(),
   }) {
     if (checkin != null) {
@@ -284,6 +299,7 @@ class _$CheckinImpl implements _Checkin {
   TResult map<TResult extends Object?>({
     required TResult Function(_Started value) started,
     required TResult Function(_Checkin value) checkin,
+    required TResult Function(_CheckinWithPhoto value) checkinWithPhoto,
   }) {
     return checkin(this);
   }
@@ -293,6 +309,7 @@ class _$CheckinImpl implements _Checkin {
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_Started value)? started,
     TResult? Function(_Checkin value)? checkin,
+    TResult? Function(_CheckinWithPhoto value)? checkinWithPhoto,
   }) {
     return checkin?.call(this);
   }
@@ -302,6 +319,7 @@ class _$CheckinImpl implements _Checkin {
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_Started value)? started,
     TResult Function(_Checkin value)? checkin,
+    TResult Function(_CheckinWithPhoto value)? checkinWithPhoto,
     required TResult orElse(),
   }) {
     if (checkin != null) {
@@ -319,6 +337,147 @@ abstract class _Checkin implements CheckinAttendanceEvent {
   String get longitude;
   @JsonKey(ignore: true)
   _$$CheckinImplCopyWith<_$CheckinImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$CheckinWithPhotoImplCopyWith<$Res> {
+  factory _$$CheckinWithPhotoImplCopyWith(_$CheckinWithPhotoImpl value,
+          $Res Function(_$CheckinWithPhotoImpl) then) =
+      __$$CheckinWithPhotoImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({CheckInOutRequestModel request});
+}
+
+/// @nodoc
+class __$$CheckinWithPhotoImplCopyWithImpl<$Res>
+    extends _$CheckinAttendanceEventCopyWithImpl<$Res, _$CheckinWithPhotoImpl>
+    implements _$$CheckinWithPhotoImplCopyWith<$Res> {
+  __$$CheckinWithPhotoImplCopyWithImpl(_$CheckinWithPhotoImpl _value,
+      $Res Function(_$CheckinWithPhotoImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? request = null,
+  }) {
+    return _then(_$CheckinWithPhotoImpl(
+      null == request
+          ? _value.request
+          : request // ignore: cast_nullable_to_non_nullable
+              as CheckInOutRequestModel,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$CheckinWithPhotoImpl implements _CheckinWithPhoto {
+  const _$CheckinWithPhotoImpl(this.request);
+
+  @override
+  final CheckInOutRequestModel request;
+
+  @override
+  String toString() {
+    return 'CheckinAttendanceEvent.checkinWithPhoto(request: $request)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$CheckinWithPhotoImpl &&
+            (identical(other.request, request) || other.request == request));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, request);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$CheckinWithPhotoImplCopyWith<_$CheckinWithPhotoImpl> get copyWith =>
+      __$$CheckinWithPhotoImplCopyWithImpl<_$CheckinWithPhotoImpl>(
+          this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() started,
+    required TResult Function(String latitute, String longitude) checkin,
+    required TResult Function(CheckInOutRequestModel request) checkinWithPhoto,
+  }) {
+    return checkinWithPhoto(request);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? started,
+    TResult? Function(String latitute, String longitude)? checkin,
+    TResult? Function(CheckInOutRequestModel request)? checkinWithPhoto,
+  }) {
+    return checkinWithPhoto?.call(request);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? started,
+    TResult Function(String latitute, String longitude)? checkin,
+    TResult Function(CheckInOutRequestModel request)? checkinWithPhoto,
+    required TResult orElse(),
+  }) {
+    if (checkinWithPhoto != null) {
+      return checkinWithPhoto(request);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_Started value) started,
+    required TResult Function(_Checkin value) checkin,
+    required TResult Function(_CheckinWithPhoto value) checkinWithPhoto,
+  }) {
+    return checkinWithPhoto(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_Started value)? started,
+    TResult? Function(_Checkin value)? checkin,
+    TResult? Function(_CheckinWithPhoto value)? checkinWithPhoto,
+  }) {
+    return checkinWithPhoto?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_Started value)? started,
+    TResult Function(_Checkin value)? checkin,
+    TResult Function(_CheckinWithPhoto value)? checkinWithPhoto,
+    required TResult orElse(),
+  }) {
+    if (checkinWithPhoto != null) {
+      return checkinWithPhoto(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _CheckinWithPhoto implements CheckinAttendanceEvent {
+  const factory _CheckinWithPhoto(final CheckInOutRequestModel request) =
+      _$CheckinWithPhotoImpl;
+
+  CheckInOutRequestModel get request;
+  @JsonKey(ignore: true)
+  _$$CheckinWithPhotoImplCopyWith<_$CheckinWithPhotoImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
