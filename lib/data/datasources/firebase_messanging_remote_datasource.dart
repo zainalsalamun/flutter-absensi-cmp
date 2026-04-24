@@ -34,12 +34,16 @@ class FirebaseMessangingRemoteDatasource {
         onDidReceiveNotificationResponse:
             (NotificationResponse notificationResponse) async {});
 
-    final fcmToken = await _firebaseMessaging.getToken();
+    try {
+      final fcmToken = await _firebaseMessaging.getToken();
+      print('FCM Token: $fcmToken');
 
-    print('FCM Token: $fcmToken');
-
-    if (fcmToken != null && await AuthLocalDatasource().getAuthData() != null) {
-      AuthRemoteDatasource().updateFcmToken(fcmToken);
+      if (fcmToken != null &&
+          await AuthLocalDatasource().getAuthData() != null) {
+        AuthRemoteDatasource().updateFcmToken(fcmToken);
+      }
+    } catch (e) {
+      print('Firebase messaging token retrieval failed: $e');
     }
 
     FirebaseMessaging.instance.getInitialMessage();
