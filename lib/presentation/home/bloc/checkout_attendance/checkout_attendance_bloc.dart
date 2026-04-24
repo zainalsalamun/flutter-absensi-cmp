@@ -15,6 +15,19 @@ class CheckoutAttendanceBloc
   CheckoutAttendanceBloc(
     this.datasource,
   ) : super(const _Initial()) {
+    on<_Checkout>((event, emit) async {
+      emit(const _Loading());
+      final requestModel = CheckInOutRequestModel(
+        latitude: event.latitude,
+        longitude: event.longitude,
+      );
+      final result = await datasource.checkout(requestModel);
+      result.fold(
+        (l) => emit(_Error(l)),
+        (r) => emit(_Loaded(r)),
+      );
+    });
+
     on<_CheckoutWithPhoto>((event, emit) async {
       emit(const _Loading());
       final result = await datasource.checkout(event.request);
