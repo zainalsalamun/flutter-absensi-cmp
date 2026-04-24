@@ -15,12 +15,16 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   ) : super(const _Initial()) {
     on<_Login>((event, emit) async {
       emit(const _Loading());
-      final result = await _authRemoteDatasource.login(event.email, event.password);
-      result.fold(
-        (l) => emit(_Error(l)),
-        (r) => emit(_Success(r)),
-      );
-     
+      try {
+        final result =
+            await _authRemoteDatasource.login(event.email, event.password);
+        result.fold(
+          (l) => emit(_Error(l)),
+          (r) => emit(_Success(r)),
+        );
+      } catch (e) {
+        emit(_Error(e.toString()));
+      }
     });
   }
 }
