@@ -19,18 +19,21 @@ mixin _$CheckoutAttendanceEvent {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() started,
+    required TResult Function(String latitude, String longitude) checkout,
     required TResult Function(CheckInOutRequestModel request) checkoutWithPhoto,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? started,
+    TResult? Function(String latitude, String longitude)? checkout,
     TResult? Function(CheckInOutRequestModel request)? checkoutWithPhoto,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? started,
+    TResult Function(String latitude, String longitude)? checkout,
     TResult Function(CheckInOutRequestModel request)? checkoutWithPhoto,
     required TResult orElse(),
   }) =>
@@ -38,18 +41,21 @@ mixin _$CheckoutAttendanceEvent {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_Started value) started,
+    required TResult Function(_Checkout value) checkout,
     required TResult Function(_CheckoutWithPhoto value) checkoutWithPhoto,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_Started value)? started,
+    TResult? Function(_Checkout value)? checkout,
     TResult? Function(_CheckoutWithPhoto value)? checkoutWithPhoto,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_Started value)? started,
+    TResult Function(_Checkout value)? checkout,
     TResult Function(_CheckoutWithPhoto value)? checkoutWithPhoto,
     required TResult orElse(),
   }) =>
@@ -114,6 +120,7 @@ class _$StartedImpl implements _Started {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() started,
+    required TResult Function(String latitude, String longitude) checkout,
     required TResult Function(CheckInOutRequestModel request) checkoutWithPhoto,
   }) {
     return started();
@@ -123,6 +130,7 @@ class _$StartedImpl implements _Started {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? started,
+    TResult? Function(String latitude, String longitude)? checkout,
     TResult? Function(CheckInOutRequestModel request)? checkoutWithPhoto,
   }) {
     return started?.call();
@@ -132,6 +140,7 @@ class _$StartedImpl implements _Started {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? started,
+    TResult Function(String latitude, String longitude)? checkout,
     TResult Function(CheckInOutRequestModel request)? checkoutWithPhoto,
     required TResult orElse(),
   }) {
@@ -145,6 +154,7 @@ class _$StartedImpl implements _Started {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_Started value) started,
+    required TResult Function(_Checkout value) checkout,
     required TResult Function(_CheckoutWithPhoto value) checkoutWithPhoto,
   }) {
     return started(this);
@@ -154,6 +164,7 @@ class _$StartedImpl implements _Started {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_Started value)? started,
+    TResult? Function(_Checkout value)? checkout,
     TResult? Function(_CheckoutWithPhoto value)? checkoutWithPhoto,
   }) {
     return started?.call(this);
@@ -163,6 +174,7 @@ class _$StartedImpl implements _Started {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_Started value)? started,
+    TResult Function(_Checkout value)? checkout,
     TResult Function(_CheckoutWithPhoto value)? checkoutWithPhoto,
     required TResult orElse(),
   }) {
@@ -175,6 +187,157 @@ class _$StartedImpl implements _Started {
 
 abstract class _Started implements CheckoutAttendanceEvent {
   const factory _Started() = _$StartedImpl;
+}
+
+/// @nodoc
+abstract class _$$CheckoutImplCopyWith<$Res> {
+  factory _$$CheckoutImplCopyWith(
+          _$CheckoutImpl value, $Res Function(_$CheckoutImpl) then) =
+      __$$CheckoutImplCopyWithImpl<$Res>;
+  @useResult
+  $Res call({String latitude, String longitude});
+}
+
+/// @nodoc
+class __$$CheckoutImplCopyWithImpl<$Res>
+    extends _$CheckoutAttendanceEventCopyWithImpl<$Res, _$CheckoutImpl>
+    implements _$$CheckoutImplCopyWith<$Res> {
+  __$$CheckoutImplCopyWithImpl(
+      _$CheckoutImpl _value, $Res Function(_$CheckoutImpl) _then)
+      : super(_value, _then);
+
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? latitude = null,
+    Object? longitude = null,
+  }) {
+    return _then(_$CheckoutImpl(
+      null == latitude
+          ? _value.latitude
+          : latitude // ignore: cast_nullable_to_non_nullable
+              as String,
+      null == longitude
+          ? _value.longitude
+          : longitude // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
+}
+
+/// @nodoc
+
+class _$CheckoutImpl implements _Checkout {
+  const _$CheckoutImpl(this.latitude, this.longitude);
+
+  @override
+  final String latitude;
+  @override
+  final String longitude;
+
+  @override
+  String toString() {
+    return 'CheckoutAttendanceEvent.checkout(latitude: $latitude, longitude: $longitude)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$CheckoutImpl &&
+            (identical(other.latitude, latitude) ||
+                other.latitude == latitude) &&
+            (identical(other.longitude, longitude) ||
+                other.longitude == longitude));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, latitude, longitude);
+
+  @JsonKey(ignore: true)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$CheckoutImplCopyWith<_$CheckoutImpl> get copyWith =>
+      __$$CheckoutImplCopyWithImpl<_$CheckoutImpl>(this, _$identity);
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() started,
+    required TResult Function(String latitude, String longitude) checkout,
+    required TResult Function(CheckInOutRequestModel request) checkoutWithPhoto,
+  }) {
+    return checkout(latitude, longitude);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? started,
+    TResult? Function(String latitude, String longitude)? checkout,
+    TResult? Function(CheckInOutRequestModel request)? checkoutWithPhoto,
+  }) {
+    return checkout?.call(latitude, longitude);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? started,
+    TResult Function(String latitude, String longitude)? checkout,
+    TResult Function(CheckInOutRequestModel request)? checkoutWithPhoto,
+    required TResult orElse(),
+  }) {
+    if (checkout != null) {
+      return checkout(latitude, longitude);
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(_Started value) started,
+    required TResult Function(_Checkout value) checkout,
+    required TResult Function(_CheckoutWithPhoto value) checkoutWithPhoto,
+  }) {
+    return checkout(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(_Started value)? started,
+    TResult? Function(_Checkout value)? checkout,
+    TResult? Function(_CheckoutWithPhoto value)? checkoutWithPhoto,
+  }) {
+    return checkout?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(_Started value)? started,
+    TResult Function(_Checkout value)? checkout,
+    TResult Function(_CheckoutWithPhoto value)? checkoutWithPhoto,
+    required TResult orElse(),
+  }) {
+    if (checkout != null) {
+      return checkout(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class _Checkout implements CheckoutAttendanceEvent {
+  const factory _Checkout(final String latitude, final String longitude) =
+      _$CheckoutImpl;
+
+  String get latitude;
+  String get longitude;
+  @JsonKey(ignore: true)
+  _$$CheckoutImplCopyWith<_$CheckoutImpl> get copyWith =>
+      throw _privateConstructorUsedError;
 }
 
 /// @nodoc
@@ -243,6 +406,7 @@ class _$CheckoutWithPhotoImpl implements _CheckoutWithPhoto {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function() started,
+    required TResult Function(String latitude, String longitude) checkout,
     required TResult Function(CheckInOutRequestModel request) checkoutWithPhoto,
   }) {
     return checkoutWithPhoto(request);
@@ -252,6 +416,7 @@ class _$CheckoutWithPhotoImpl implements _CheckoutWithPhoto {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? started,
+    TResult? Function(String latitude, String longitude)? checkout,
     TResult? Function(CheckInOutRequestModel request)? checkoutWithPhoto,
   }) {
     return checkoutWithPhoto?.call(request);
@@ -261,6 +426,7 @@ class _$CheckoutWithPhotoImpl implements _CheckoutWithPhoto {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? started,
+    TResult Function(String latitude, String longitude)? checkout,
     TResult Function(CheckInOutRequestModel request)? checkoutWithPhoto,
     required TResult orElse(),
   }) {
@@ -274,6 +440,7 @@ class _$CheckoutWithPhotoImpl implements _CheckoutWithPhoto {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(_Started value) started,
+    required TResult Function(_Checkout value) checkout,
     required TResult Function(_CheckoutWithPhoto value) checkoutWithPhoto,
   }) {
     return checkoutWithPhoto(this);
@@ -283,6 +450,7 @@ class _$CheckoutWithPhotoImpl implements _CheckoutWithPhoto {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(_Started value)? started,
+    TResult? Function(_Checkout value)? checkout,
     TResult? Function(_CheckoutWithPhoto value)? checkoutWithPhoto,
   }) {
     return checkoutWithPhoto?.call(this);
@@ -292,6 +460,7 @@ class _$CheckoutWithPhotoImpl implements _CheckoutWithPhoto {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(_Started value)? started,
+    TResult Function(_Checkout value)? checkout,
     TResult Function(_CheckoutWithPhoto value)? checkoutWithPhoto,
     required TResult orElse(),
   }) {
