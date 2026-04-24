@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 
 import 'package:dartz/dartz.dart';
 import 'package:flutter_absensi_app/core/constants/variables.dart';
@@ -14,19 +15,28 @@ class AuthRemoteDatasource {
     String password,
   ) async {
     final url = Uri.parse('${Variables.baseUrl}/api/login');
-    final response = await http.post(
-      url,
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: jsonEncode({'email': username, 'password': password}),
-    );
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({'email': username, 'password': password}),
+      );
 
-    if (response.statusCode == 200) {
-      return Right(AuthResponseModel.fromJson(response.body));
-    } else {
-      return const Left('Failed to login');
+      debugPrint('Login URL: $url');
+      debugPrint('Login Response Status: ${response.statusCode}');
+      debugPrint('Login Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        return Right(AuthResponseModel.fromJson(response.body));
+      } else {
+        return const Left('Failed to login');
+      }
+    } catch (e) {
+      debugPrint('Login Exception: $e');
+      return Left('Error: $e');
     }
   }
 
