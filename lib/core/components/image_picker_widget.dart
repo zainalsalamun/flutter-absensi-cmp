@@ -29,9 +29,9 @@ class ImagePickerWidget extends StatefulWidget {
 class _ImagePickerWidgetState extends State<ImagePickerWidget> {
   String? imagePath;
 
-  Future<void> _pickImage() async {
+  Future<void> _pickImage(ImageSource source) async {
     final pickedFile = await ImagePicker().pickImage(
-      source: ImageSource.gallery,
+      source: source,
       imageQuality: 50,
     );
 
@@ -44,6 +44,55 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
         widget.onChanged(null);
       }
     });
+  }
+
+  void _showSelectionDialog() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+      ),
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Pilih Sumber Foto',
+                style: TextStyle(
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SpaceHeight(20.0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _SelectionItem(
+                    icon: Icons.photo_library,
+                    label: 'Galeri',
+                    onTap: () {
+                      Navigator.pop(context);
+                      _pickImage(ImageSource.gallery);
+                    },
+                  ),
+                  _SelectionItem(
+                    icon: Icons.camera_alt,
+                    label: 'Kamera',
+                    onTap: () {
+                      Navigator.pop(context);
+                      _pickImage(ImageSource.camera);
+                    },
+                  ),
+                ],
+              ),
+              const SpaceHeight(20.0),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -110,7 +159,7 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
                 child: Button.filled(
                   height: 50.0,
                   width: 132.0,
-                  onPressed: _pickImage,
+                  onPressed: _showSelectionDialog,
                   label: 'Pilih Foto',
                   fontSize: 12.0,
                   borderRadius: 10.0,
@@ -120,6 +169,49 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _SelectionItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  const _SelectionItem({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16.0),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              icon,
+              color: AppColors.primary,
+              size: 32.0,
+            ),
+          ),
+          const SpaceHeight(8.0),
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 14.0,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
