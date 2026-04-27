@@ -1,16 +1,10 @@
 import 'dart:io';
-import 'dart:convert';
-import 'dart:typed_data';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:image_picker/image_picker.dart';
-import '../../../presentation/home/bloc/checkout_attendance/checkout_attendance_bloc.dart';
-import '../../../presentation/home/pages/attendance_success_page.dart';
-import '../../../presentation/home/pages/location_page.dart';
+import 'location_page.dart';
 import '../../../core/core.dart';
-import '../../../data/models/request/checkinout_request_model.dart';
+import 'package:flutter_absensi_app/presentation/home/pages/attandences/attendance_result_page.dart';
 
 class AttendanceCheckoutPage extends StatefulWidget {
   const AttendanceCheckoutPage({super.key});
@@ -20,7 +14,6 @@ class AttendanceCheckoutPage extends StatefulWidget {
 }
 
 class _AttendanceCheckoutPageState extends State<AttendanceCheckoutPage> {
-  final ImagePicker _picker = ImagePicker();
   XFile? _capturedPhoto;
   CameraController? _cameraController;
   bool _isCameraInitialized = false;
@@ -84,65 +77,10 @@ class _AttendanceCheckoutPageState extends State<AttendanceCheckoutPage> {
     _initializeCamera();
   }
 
-  void _confirmPhoto() {
-    if (_capturedPhoto == null) return;
-    _submitAttendance();
-  }
-
   void _retakePhoto() {
     setState(() {
       _capturedPhoto = null;
     });
-  }
-
-  Future<void> _submitAttendance() async {
-    if (latitude == null || longitude == null) {
-      try {
-        final position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.best,
-        );
-        latitude = position.latitude;
-        longitude = position.longitude;
-      } catch (e) {
-        // ignore
-      }
-    }
-
-    if (latitude == null || longitude == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Lokasi belum ditemukan, pastikan GPS aktif.'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
-    if (_capturedPhoto == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Foto belum diambil.'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
-    // Convert photo to multipart file
-    final photoFile = File(_capturedPhoto!.path);
-    final Uint8List photoBytes = await photoFile.readAsBytes();
-    final String base64Photo = base64Encode(photoBytes);
-    final request = CheckInOutRequestModel(
-      latitude: latitude.toString(),
-      longitude: longitude.toString(),
-      photo: base64Photo,
-    );
-
-    if (mounted) {
-      context.read<CheckoutAttendanceBloc>().add(
-            CheckoutAttendanceEvent.checkoutWithPhoto(request),
-          );
-    }
   }
 
   Future<void> getCurrentPosition() async {
@@ -177,6 +115,32 @@ class _AttendanceCheckoutPageState extends State<AttendanceCheckoutPage> {
   void dispose() {
     _cameraController?.dispose();
     super.dispose();
+  }
+
+  Future<void> _submitAttendance() async {
+    final String? photoPath = _capturedPhoto?.path;
+
+    if (photoPath == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Foto belum diambil.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    if (mounted) {
+      debugPrint('[Checkout] Navigating to Result with photo: $photoPath');
+      context.pushReplacement(
+        AttendanceResultPage(
+          isCheckin: false,
+          isMatch: true,
+          attendanceType: 'Face',
+          photo: photoPath,
+        ),
+      );
+    }
   }
 
   @override
@@ -214,11 +178,11 @@ class _AttendanceCheckoutPageState extends State<AttendanceCheckoutPage> {
                     child: const Text('Ulangi Foto'),
                   ),
                   ElevatedButton(
-                    onPressed: _confirmPhoto,
+                    onPressed: _submitAttendance,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
                     ),
-                    child: const Text('Kirim Absen'),
+                    child: const Text('Lanjutkan'),
                   ),
                 ],
               ),
@@ -300,42 +264,13 @@ class _AttendanceCheckoutPageState extends State<AttendanceCheckoutPage> {
                           icon: Assets.icons.reverse.svg(width: 48.0),
                         ),
                         const Spacer(),
-                        BlocConsumer<CheckoutAttendanceBloc,
-                            CheckoutAttendanceState>(
-                          listener: (context, state) {
-                            state.maybeWhen(
-                              orElse: () {},
-                              error: (message) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text(message)),
-                                );
-                              },
-                              loaded: (responseModel) {
-                                context.pushReplacement(
-                                  const AttendanceSuccessPage(
-                                    status: 'Berhasil Checkout',
-                                  ),
-                                );
-                              },
-                            );
-                          },
-                          builder: (context, state) {
-                            return state.maybeWhen(
-                              orElse: () {
-                                return IconButton(
-                                  onPressed: _isTakingPhoto ? null : _takePhoto,
-                                  icon: const Icon(
-                                    Icons.circle,
-                                    size: 70.0,
-                                    color: AppColors.red,
-                                  ),
-                                );
-                              },
-                              loading: () => const Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                            );
-                          },
+                        IconButton(
+                          onPressed: _isTakingPhoto ? null : _takePhoto,
+                          icon: const Icon(
+                            Icons.circle,
+                            size: 70.0,
+                            color: AppColors.red,
+                          ),
                         ),
                         const Spacer(),
                         const SpaceWidth(48.0),
