@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_absensi_app/core/helper/radius_calculate.dart';
-import 'package:flutter_absensi_app/data/datasources/auth_local_datasource.dart';
 import 'package:flutter_absensi_app/presentation/home/bloc/get_company/get_company_bloc.dart';
 import 'package:flutter_absensi_app/presentation/home/bloc/is_checkedin/is_checkedin_bloc.dart';
-import 'package:flutter_absensi_app/presentation/home/pages/attandences/attendance_result_page.dart';
 import 'package:flutter_absensi_app/presentation/home/pages/attandences/scanner_page.dart';
 import 'package:flutter_absensi_app/presentation/home/pages/attendance_checkout_page.dart';
+import 'package:flutter_absensi_app/presentation/home/pages/attendance_checkin_page.dart';
 import 'package:flutter_absensi_app/presentation/home/pages/permission_page.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -416,25 +415,13 @@ class _HomePageState extends State<HomePage> {
                             if (isCheckin) {
                               _showWarningDialog('Anda sudah checkin');
                             } else {
-                              if (attendanceType == 'Face') {
-                                context.push(
-                                  AttendanceResultPage(
-                                    isCheckin: true,
-                                    isMatch: true,
-                                    attendanceType: attendanceType,
-                                  ),
-                                );
-                              } else if (attendanceType == 'QR') {
+                              if (attendanceType == 'QR') {
                                 context.push(
                                   const ScannerPage(isCheckin: true),
                                 );
                               } else {
                                 context.push(
-                                  AttendanceResultPage(
-                                    isCheckin: true,
-                                    isMatch: true,
-                                    attendanceType: attendanceType,
-                                  ),
+                                  const AttendanceCheckinPage(),
                                 );
                               }
                             }
@@ -464,16 +451,16 @@ class _HomePageState extends State<HomePage> {
                       orElse: () => 'Location',
                       success: (data) => data.attendanceType!,
                     );
-                    return BlocBuilder<IsCheckedinBloc, IsCheckedinState>(
+                    return BlocConsumer<IsCheckedinBloc, IsCheckedinState>(
+                      listener: (context, state) {
+                        //
+                      },
                       builder: (context, state) {
-                        final isCheckout = state.maybeWhen(
-                          orElse: () => false,
-                          success: (data) => data.isCheckedout,
-                        );
-                        final isCheckIn = state.maybeWhen(
+                        final isCheckin = state.maybeWhen(
                           orElse: () => false,
                           success: (data) => data.isCheckedin,
                         );
+
                         return MenuButton(
                           label: 'Pulang',
                           iconData: Icons.logout_rounded,
@@ -503,32 +490,17 @@ class _HomePageState extends State<HomePage> {
                               );
                               return;
                             }
-                            if (!isCheckIn) {
-                              _showWarningDialog(
-                                'Anda belum checkin, silahkan checkin terlebih dahulu',
-                              );
-                            } else if (isCheckout) {
-                              _showWarningDialog('Anda sudah checkout');
+
+                            if (!isCheckin) {
+                              _showWarningDialog('Anda belum checkin');
                             } else {
-                              if (attendanceType == 'Face') {
-                                context.push(
-                                  AttendanceResultPage(
-                                    isCheckin: false,
-                                    isMatch: true,
-                                    attendanceType: attendanceType,
-                                  ),
-                                );
-                              } else if (attendanceType == 'QR') {
+                              if (attendanceType == 'QR') {
                                 context.push(
                                   const ScannerPage(isCheckin: false),
                                 );
                               } else {
                                 context.push(
-                                  AttendanceResultPage(
-                                    isCheckin: false,
-                                    isMatch: true,
-                                    attendanceType: attendanceType,
-                                  ),
+                                  const AttendanceCheckoutPage(),
                                 );
                               }
                             }
