@@ -1,13 +1,11 @@
 import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:geolocator/geolocator.dart.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../presentation/home/bloc/checkin_attendance/checkin_attendance_bloc.dart';
-import '../../presentation/home/pages/attendance_success_page.dart';
-import '../../presentation/home/pages/location_page.dart';
+import 'location_page.dart';
 import '../../../core/core.dart';
+import 'package:flutter_absensi_app/presentation/home/pages/attandences/attendance_result_page.dart';
 
 class AttendanceCheckinPage extends StatefulWidget {
   const AttendanceCheckinPage({super.key});
@@ -17,7 +15,6 @@ class AttendanceCheckinPage extends StatefulWidget {
 }
 
 class _AttendanceCheckinPageState extends State<AttendanceCheckinPage> {
-  final ImagePicker _picker = ImagePicker();
   XFile? _capturedPhoto;
   CameraController? _cameraController;
   bool _isCameraInitialized = false;
@@ -81,11 +78,6 @@ class _AttendanceCheckinPageState extends State<AttendanceCheckinPage> {
     _initializeCamera();
   }
 
-  void _confirmPhoto() {
-    if (_capturedPhoto == null) return;
-    _submitAttendance();
-  }
-
   void _retakePhoto() {
     setState(() {
       _capturedPhoto = null;
@@ -93,29 +85,9 @@ class _AttendanceCheckinPageState extends State<AttendanceCheckinPage> {
   }
 
   Future<void> _submitAttendance() async {
-    if (latitude == null || longitude == null) {
-      try {
-        final position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.best,
-        );
-        latitude = position.latitude;
-        longitude = position.longitude;
-      } catch (e) {
-        // ignore
-      }
-    }
+    final String? photoPath = _capturedPhoto?.path;
 
-    if (latitude == null || longitude == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Lokasi belum ditemukan, pastikan GPS aktif.'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
-    if (_capturedPhoto == null) {
+    if (photoPath == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Foto belum diambil.'),
@@ -125,17 +97,15 @@ class _AttendanceCheckinPageState extends State<AttendanceCheckinPage> {
       return;
     }
 
-    // Convert photo to multipart file
-    final photoFile = File(_capturedPhoto!.path);
-    final request = CheckInOutRequestModel(
-      latitude: latitude.toString(),
-      longitude: longitude.toString(),
-      photo: await photoFile.readAsBytes(),
-    );
-
     if (mounted) {
-      context.read<CheckinAttendanceBloc>().add(
-        CheckinAttendanceEvent.checkinWithPhoto(request),
+      debugPrint('[Checkin] Navigating to Result with photo: $photoPath');
+      context.pushReplacement(
+        AttendanceResultPage(
+          isCheckin: true,
+          isMatch: true,
+          attendanceType: 'Face',
+          photo: photoPath,
+        ),
       );
     }
   }
@@ -209,11 +179,11 @@ class _AttendanceCheckinPageState extends State<AttendanceCheckinPage> {
                     child: const Text('Ulangi Foto'),
                   ),
                   ElevatedButton(
-                    onPressed: _confirmPhoto,
+                    onPressed: _submitAttendance,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
                     ),
-                    child: const Text('Kirim Absen'),
+                    child: const Text('Lanjutkan'),
                   ),
                 ],
               ),
@@ -295,44 +265,13 @@ class _AttendanceCheckinPageState extends State<AttendanceCheckinPage> {
                           icon: Assets.icons.reverse.svg(width: 48.0),
                         ),
                         const Spacer(),
-                        BlocConsumer<
-                          CheckinAttendanceBloc,
-                          CheckinAttendanceState
-                        >(
-                          listener: (context, state) {
-                            state.maybeWhen(
-                              orElse: () {},
-                              error: (message) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text(message)),
-                                );
-                              },
-                              loaded: (responseModel) {
-                                context.pushReplacement(
-                                  const AttendanceSuccessPage(
-                                    status: 'Berhasil Checkin',
-                                  ),
-                                );
-                              },
-                            );
-                          },
-                          builder: (context, state) {
-                            return state.maybeWhen(
-                              orElse: () {
-                                return IconButton(
-                                  onPressed: _isTakingPhoto ? null : _takePhoto,
-                                  icon: const Icon(
-                                    Icons.circle,
-                                    size: 70.0,
-                                    color: AppColors.red,
-                                  ),
-                                );
-                              },
-                              loading: () => const Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                            );
-                          },
+                        IconButton(
+                          onPressed: _isTakingPhoto ? null : _takePhoto,
+                          icon: const Icon(
+                            Icons.circle,
+                            size: 70.0,
+                            color: AppColors.red,
+                          ),
                         ),
                         const Spacer(),
                         const SpaceWidth(48.0),
